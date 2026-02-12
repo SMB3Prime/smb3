@@ -11,6 +11,13 @@
 ; This source file last updated: 2012-02-13 22:44:39.225983982 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_07"
+
+.export Gameplay_UpdateAndDrawMisc, Scores_GiveAndDraw
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; Player_DoLavaDonutArrowBounce
@@ -33,7 +40,7 @@ ArrowPlat_DirByTile:
     .byte $00, $00, $03, $03, $01, $01, $00, $00, $00
 
 ArrowPlat_XOff:
-    .byte 0, -16, 0, -16, 0, -16, 0, 0, -16
+    .byte 0, <-16, 0, <-16, 0, <-16, 0, 0, <-16
 
 Player_DoLavaDonutArrowBounce:
     LDA Player_IsDying
@@ -102,7 +109,7 @@ PRG007_A027:
     BNE PRG007_A070  ; If this is not a bumped block tile, jump to PRG007_A070
 
     ; Otherwise, bounce Player!
-    LDA #-$30
+    LDA #<-$30
     STA Player_YVel
 
 PRG007_A06F:
@@ -611,7 +618,7 @@ PRG007_A2E3:
     ; Set Player Projectile Y velocity
     LDA #$03     ; A = $03 (Fireballs are thrown down)
     BCS PRG007_A2EC  ; If Player is NOT wearing Hammer Suit, jump to PRG007_A2EC
-    LDA #-$03    ; A = -$03 (Hammers are thrown up)
+    LDA #<-$03    ; A = <-$03 (Hammers are thrown up)
 PRG007_A2EC:
     STA PlayerProj_YVel,X
 
@@ -828,7 +835,7 @@ PRG007_A3EF:
     RTS      ; Return
 
 PRG007_A3F0:
-    ADC #-$08    ; X Relative - 8
+    ADC #<-$08    ; X Relative - 8
     STA Temp_Var14  ; -> Temp_Var14
 
     LDA PlayerProj_ID,X
@@ -1042,7 +1049,7 @@ PRG007_A4E9:
     LDA Level_VertScrollH   ; Current vertical scroll high
     ADC #$00     ; Apply carry
 
-PRG007_A4F8
+PRG007_A4F8:
     STA Temp_Var4   ; -> Temp_Var4
     BEQ PRG007_A506  ; If vertical high = 0, jump to PRG007_A506
 
@@ -1179,7 +1186,7 @@ PRG007_A586:
 PRG007_A594:
 
     ; Bounce fireball!
-    LDA #-$03
+    LDA #<-$03
 
 PRG007_A596:
     STA PlayerProj_YVel,X
@@ -1308,10 +1315,10 @@ PRG007_A626:
     LDA Temp_Var7
     BEQ PRG007_A642  ; If effect value = 0, jump to PRG007_A642
 
-    LDY #-$05    ; Y = -$05 (high bounce velocity)
+    LDY #<-$05    ; Y = <-$05 (high bounce velocity)
     EOR PlayerProj_XVel,X
     BMI PRG007_A633
-    LDY #-$02    ; Y = -$02 (low bounce velocity)
+    LDY #<-$02    ; Y = <-$02 (low bounce velocity)
 PRG007_A633:
     TYA
     JMP PRG007_A596  ; Jump to PRG007_A596
@@ -1437,7 +1444,7 @@ PRG007_A6C9:
 PRG007_A6DD:
 
     ; Enemy bounces upward a bit
-    LDA #-$34
+    LDA #<-$34
     STA Objects_YVel,Y
 
     ; Set object's velocity based on Player's velocity (sort of works)
@@ -1445,7 +1452,7 @@ PRG007_A6DD:
     ASL A
     LDA #$0C
     BCC PRG007_A6EC  ; If Player's X Velocity is negative, jump to PRG007_A6EC
-    LDA #-$0C
+    LDA #<-$0C
 PRG007_A6EC:
     STA Objects_XVel,Y
 
@@ -1660,7 +1667,7 @@ PRG007_A7C9:
     LDA Counter_1
     AND #$03
     SEC
-    SBC #$02     ; A = -2 to 1 (spread value)
+    SBC #$02     ; A = <-2 to 1 (spread value)
 
     JSR Draw_SpreadAndColorful   ; Spreads out the two sprites and rotates the color palette
 
@@ -1936,7 +1943,7 @@ PRG007_A91E:
 
     RTS      ; Return
 
-Bubble_XOff:        .byte $00, $01, $00, -$01
+Bubble_XOff:        .byte $00, $01, $00, <-$01
 Bubble_SprRAMOff:   .byte $10, $14, $0C, $FF, $10, $14, $0C
 
 Bubble_Draw:
@@ -2286,7 +2293,7 @@ PRG007_AACF:
     ; Add Score's value to Score_Earned
     LDA Score_Earned
     CLC
-    ADC ScoreAdd_L-1,Y  ; -1 because a score value of zero is "empty"
+    ADC ScoreAdd_L-1,Y  ; <-1 because a score value of zero is "empty"
     STA Score_Earned
     LDA Score_Earned+1
     ADC ScoreAdd_H-1,Y
@@ -2409,7 +2416,7 @@ PRG007_AB76:
 
     LDX Temp_Var1   ; X = score value
 
-    LDA Score_PatternLeft-1,X    ; -1 because a score value of zero is "empty"
+    LDA Score_PatternLeft-1,X    ; <-1 because a score value of zero is "empty"
 
     LDX SlotIndexBackup     ; X = score slot index
 
@@ -3077,7 +3084,7 @@ PRG007_AEC0:
 
 PRG007_AEC9:
     ; Bounce fireball!
-    LDA #-$2C
+    LDA #<-$2C
     STA SpecialObj_YVel,X
 
 PRG007_AECE:
@@ -3406,8 +3413,8 @@ Laser_PrepSpritesAndHit:
 PRG007_B058:
     RTS      ; Return
 
-BlooperKid_VelAccel:    .byte $01, -$01
-BlooperKid_VelLimit:    .byte $10, -$10
+BlooperKid_VelAccel:    .byte $01, <-$01
+BlooperKid_VelLimit:    .byte $10, <-$10
 BlooperKid_SpriteYOff:  .byte $00, $01, $02, $03, $04, $05, $06, $07, $08, $07, $06, $05, $04, $03, $02, $01
 
 SObj_BlooperKid:
@@ -3940,7 +3947,7 @@ SObj_Bubble:
 
     JMP SpecialObj_Remove    ; Otherwise, remove the bubble
 
-PRG007_B32D
+PRG007_B32D:
     LDA SpecialObj_Data,X
     BNE PRG007_B352  ; If data <> 0, jump to PRG007_B352
 
@@ -4132,7 +4139,7 @@ PRG007_B426:
     STA SpecialObj_YVel,X
 
     ; Player bounces off cannonball
-    LDA #-$30
+    LDA #<-$30
     STA Player_YVel
 
     ; Cannonball kick sound
@@ -4439,8 +4446,8 @@ PRG007_B588:
 PRG007_B5B1:
     RTS      ; Return
 
-Microgoomba_XAccel: .byte $01, -$01
-Microgoomba_XLimit: .byte $10, -$10
+Microgoomba_XAccel: .byte $01, <-$01
+Microgoomba_XLimit: .byte $10, <-$10
 
 Microgoomba_SprRAMAlt:  .byte $00, $04, $08, $0C, $10, $14, $18, $1C, $20, $24
 
@@ -4502,7 +4509,7 @@ PRG007_B601:
     STA SpecialObj_Data,X
 
     ; Microgoomba flops off
-    LDA #-$20
+    LDA #<-$20
     STA SpecialObj_YVel,X
 
     LDA #$08     ; A = $08
@@ -4510,7 +4517,7 @@ PRG007_B601:
     LDY RandomN,X
     BPL PRG007_B614  ; 50/50 chance we jump to PRG007_B614
 
-    LDA #-$08    ; A = -$08
+    LDA #<-$08    ; A = <-$08
 
 PRG007_B614:
     STA SpecialObj_XVel,X    ; Random X velocity
@@ -4664,16 +4671,16 @@ PRG007_B6CF:
     ; The hammer starting X is offset
 Hammer_XOff:
     ;  Not-HF HF  (HF = Horizontally flipped)
-    .byte  8, -8    ; Non-Heavy Hammer hold offset
-    .byte  8, -8    ; Non-Heavy Boomerang hold offset
-    .byte 16, -8    ; Heavy Bro hold offset
+    .byte  8, <-8    ; Non-Heavy Hammer hold offset
+    .byte  8, <-8    ; Non-Heavy Boomerang hold offset
+    .byte 16, <-8    ; Heavy Bro hold offset
 
     ; The hammer starting Y is offset
 Hammer_YOff:
     ;  Not-HF HF  (HF = Horizontally flipped)
     .byte  3,  3    ; Non-Heavy Hammer hold offset
     .byte  3,  3    ; Non-Heavy Boomerang hold offset
-    .byte -6, -6    ; Heavy Bro hold offset
+    .byte <-6, <-6    ; Heavy Bro hold offset
 
 SObjYOff_PlayerSize:    .byte 18, 10    ; Small vs not small
 SObj_VLimit:    .byte $10, $16
@@ -5025,10 +5032,10 @@ PRG007_B888:
 
     RTS      ; Return
 
-Boomerang_XVelDelta:    .byte $01, -$01
+Boomerang_XVelDelta:    .byte $01, <-$01
 Boomerang_XVelLimit:    .byte $20, $E0
-Boomerang_YVelAccel:    .byte $01, -$01
-Boomerang_YVelLimit:    .byte $12, -$12
+Boomerang_YVelAccel:    .byte $01, <-$01
+Boomerang_YVelLimit:    .byte $12, <-$12
 
 Boomerang_Attributes:   .byte SPR_HFLIP | SPR_VFLIP, SPR_HFLIP | SPR_VFLIP, $00, $00
 
@@ -5181,10 +5188,10 @@ PRG007_B92A:
 PRG007_B979:
     RTS      ; Return
 
-SObj_UNKNOWN_XAccel:    .byte $01, -$01
+SObj_UNKNOWN_XAccel:    .byte $01, <-$01
 SObj_UNKNOWN_XLimit:    .byte $20, $E0
-SObj_UNKNOWN_YAccel:    .byte $04, -$01
-SObj_UNKNOWN_YLimit:    .byte $0F, -$12
+SObj_UNKNOWN_YAccel:    .byte $04, <-$01
+SObj_UNKNOWN_YLimit:    .byte $0F, <-$12
 
 SObj_UNKNOWN:
     LDA Player_HaltGame
@@ -5799,12 +5806,12 @@ PRG007_BC5C:
     BGE PRG007_BC81  ; Basically if this is the right-shooting BIG Cannon, jump to PRG007_BC81
 
     LDY #$09     ; Y = $09
-    LDA #-$30    ; A = -$30
+    LDA #<-$30    ; A = <-$30
 
 PRG007_BC81:
     STY Temp_Var1   ; Temp_Var1 = $12 (if right-shooting) or $09 (if left-shooting)
 
-    STA Objects_XVel,X  ; X velocity = -$30 or $30, depending on direction
+    STA Objects_XVel,X  ; X velocity = <-$30 or $30, depending on direction
 
     EOR #$80     ; Invert the sign bit
 
@@ -5816,7 +5823,7 @@ PRG007_BC81:
     LDA CannonFire_X,Y
     BCS PRG007_BC92  ; If right-shooting, jump to PRG007_BC92
     SEC
-    SBC #16     ; -16 for left-shooting
+    SBC #16     ; <-16 for left-shooting
 PRG007_BC92:
     STA Objects_X,X
     LDA CannonFire_XHi,Y
@@ -5869,7 +5876,7 @@ PRG007_BCB4:
     STA Objects_YHi,X
 
     ; Set Bob-omb's Y velocity
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel,X
 
     LDA Temp_Var1
@@ -5880,7 +5887,7 @@ PRG007_BCB4:
     BCS PRG007_BCE9  ; If this is a right-shot Bob-omb, jump to PRG007_BCE9
 
     DEY      ; Y = $0A
-    LDA #-$10    ; A = -$10
+    LDA #<-$10    ; A = <-$10
 
 PRG007_BCE9:
     STY Temp_Var1   ; Temp_Var1 = $0A or $0B
@@ -5897,7 +5904,7 @@ PRG007_BCE9:
     ; Set Bob-omb's X
     LDA #$08     ; A = $08
     BCC PRG007_BCFC  ; If this is a right-shot Bob-omb, jump to PRG007_BCFC
-    LDA #-$08    ; A = -$08
+    LDA #<-$08    ; A = <-$08
     DEC Temp_Var2   ; Temp_Var2 = $FF (16-bit sign extension)
 PRG007_BCFC:
     CLC
@@ -6009,11 +6016,11 @@ PRG007_BD7B:
 PRG007_BD82:
     .byte $00, $08, $10, $18, $20, $28, $30, $38
 
-FourWay_CannonballXVel: .byte $00, $0B, $10, $0B, $00, -$0B, -$10, -$0B
+FourWay_CannonballXVel: .byte $00, $0B, $10, $0B, $00, <-$0B, <-$10, <-$0B
 
     .byte $F0, $F0, $F5, $0B, $F5, $0B, $F5, $0B, $F5, $0B, $10, $10
 
-FourWay_CannonballYVel: .byte -$10, -$0B, $00, $0B, $10, $0B, $00, -$0B
+FourWay_CannonballYVel: .byte <-$10, <-$0B, $00, $0B, $10, $0B, $00, <-$0B
 
     .byte $00, $00, $F5, $F5, $0B, $0B, $F5, $F5, $0B, $0B, $00, $00
 
@@ -6022,11 +6029,11 @@ CannonPoof_XOffs:
 FourWay_CPXOff: .byte $08, $18, $1C, $18, $08, $F8, $F4, $F8
 
 Cannons_CPXOff:
-    .byte -$0C  ; CFIRE_ULCANNON
-    .byte -$0C  ; CFIRE_URCANNON
-    .byte -$08  ; CFIRE_LLCANNON
+    .byte <-$0C  ; CFIRE_ULCANNON
+    .byte <-$0C  ; CFIRE_URCANNON
+    .byte <-$08  ; CFIRE_LLCANNON
     .byte  $08  ; CFIRE_LRCANNON
-    .byte -$08  ; CFIRE_HLCANNON2
+    .byte <-$08  ; CFIRE_HLCANNON2
     .byte  $08  ; CFIRE_ULCANNON2
     .byte  $00  ; CFIRE_URCANNON2
     .byte  $00  ; CFIRE_LLCANNON2
@@ -6036,7 +6043,7 @@ Cannons_CPXOff:
     .byte  $0C  ; CFIRE_RBOBOMBS
 
 
-Bill_CPXOff:    .byte $0C, -$0C     ; Bullet/Missile Bill
+Bill_CPXOff:    .byte $0C, <-$0C     ; Bullet/Missile Bill
 
 
 CannonPoof_YOffs:
@@ -6046,8 +6053,8 @@ FourWay_CPYOff: .byte $F3, $F7, $07, $17, $1B, $17, $07, $F7
 Cannons_CPYOff:
     .byte  $00  ; CFIRE_ULCANNON
     .byte  $08  ; CFIRE_URCANNON
-    .byte -$08  ; CFIRE_LLCANNON
-    .byte -$08  ; CFIRE_LRCANNON
+    .byte <-$08  ; CFIRE_LLCANNON
+    .byte <-$08  ; CFIRE_LRCANNON
     .byte  $08  ; CFIRE_HLCANNON2
     .byte  $08  ; CFIRE_ULCANNON2
     .byte  $00  ; CFIRE_URCANNON2
@@ -6299,7 +6306,7 @@ CFire_RockyWrench:
 PRG007_BF28:
     RTS      ; Return
 
-Bill_XVelTowardsPlayer: .byte $18, -$18
+Bill_XVelTowardsPlayer: .byte $18, <-$18
 Bill_FlipTowardsPlayer: .byte SPR_HFLIP, $00
 Bill_Var4TowardsPlayer: .byte $01, $00
 

@@ -11,6 +11,10 @@
 ; This source file last updated: 2011-12-14 17:45:42.706614297 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
     ; CAUTION!! ObjectGroup02 labels MUST appear at the
     ; address specified by the predefined constants!  I can't
     ; verify this at the assembler level, so be careful!!
@@ -22,7 +26,11 @@
 
     ; Object group $02 (i.e. objects starting at ID $48) State 1 jump table
 
-    .base ObjectGroup_InitJumpTable  ; <-- help enforce this table *here*
+.segment "PRG_03"
+
+.export BobOmb_Explode
+
+.assert * = ObjectGroup_InitJumpTable, error, "ObjectGroup_InitJumpTable must be at $A000"
 ObjectGroup02_InitJumpTable:
     .word ObjInit_TinyCheepCheep    ; Object $48 - OBJ_TINYCHEEPCHEEP
     .word ObjInit_FloatingBGCloud   ; Object $49 - OBJ_FLOATINGBGCLOUD
@@ -64,7 +72,7 @@ ObjectGroup02_InitJumpTable:
 
     ; Object group $02 (i.e. objects starting at ID $48) State 2 jump table
 
-    .base ObjectGroup_NormalJumpTable    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_NormalJumpTable, error, "ObjectGroup_NormalJumpTable must be at $A048"
 ObjectGroup02_NormalJumpTable:
     .word ObjNorm_TinyCheepCheep    ; Object $48 - OBJ_TINYCHEEPCHEEP
     .word ObjNorm_FloatingBGCloud   ; Object $49 - OBJ_FLOATINGBGCLOUD
@@ -107,7 +115,7 @@ ObjectGroup02_NormalJumpTable:
     ; Object group $02 (i.e. objects starting at ID $48) Collision routine jump table (if calling Object_HitTestRespond;
     ; Special values of OCSPECIAL_KILLCHANGETO or OCSPECIAL_HIGHSCORE can be used here instead otherwise.)
 
-    .base ObjectGroup_CollideJumpTable   ; <-- help enforce this table *here*
+.assert * = ObjectGroup_CollideJumpTable, error, "ObjectGroup_CollideJumpTable must be at $A090"
 ObjectGroup02_CollideJumpTable:
     .word ObjHit_DoNothing  ; Object $48 - OBJ_TINYCHEEPCHEEP
     .word ObjHit_DoNothing  ; Object $49 - OBJ_FLOATINGBGCLOUD
@@ -149,7 +157,7 @@ ObjectGroup02_CollideJumpTable:
 
     ; Object group $02 (i.e. objects starting at ID $48) attribute bits set 1 (OA1_* flags valid here)
 
-    .base ObjectGroup_Attributes ; <-- help enforce this table *here*
+.assert * = ObjectGroup_Attributes, error, "ObjectGroup_Attributes must be at $A0D8"
 ObjectGroup02_Attributes:
     .byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH16 ; Object $48 - OBJ_TINYCHEEPCHEEP
     .byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH48 ; Object $49 - OBJ_FLOATINGBGCLOUD
@@ -190,7 +198,7 @@ ObjectGroup02_Attributes:
 
     ; Object group $02 (i.e. objects starting at ID $48) second set attribute bits
 
-    .base ObjectGroup_Attributes2    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_Attributes2, error, "ObjectGroup_Attributes2 must be at $A0FC"
 ObjectGroup02_Attributes2:
     .byte OA2_NOSHELLORSQUASH | OA2_TDOGRP1 ; Object $48 - OBJ_TINYCHEEPCHEEP
     .byte OA2_TDOGRP0   ; Object $49 - OBJ_FLOATINGBGCLOUD
@@ -232,7 +240,7 @@ ObjectGroup02_Attributes2:
 
     ; Object group $02 (i.e. objects starting at ID $48) third set attribute bits
 
-    .base ObjectGroup_Attributes3    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_Attributes3, error, "ObjectGroup_Attributes3 must be at $A120"
 ObjectGroup02_Attributes3:
     .byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE    ; Object $48 - OBJ_TINYCHEEPCHEEP
     .byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE   ; Object $49 - OBJ_FLOATINGBGCLOUD
@@ -274,7 +282,7 @@ ObjectGroup02_Attributes3:
 
     ; Object group $02 (i.e. objects starting at ID $48) Pattern Table Select
 
-    .base ObjectGroup_PatTableSel    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_PatTableSel, error, "ObjectGroup_PatTableSel must be at $A144"
 ObjectGroup02_PatTableSel:
     .byte OPTS_SETPT5 | $1A ; Object $48 - OBJ_TINYCHEEPCHEEP
     .byte OPTS_SETPT5 | $36 ; Object $49 - OBJ_FLOATINGBGCLOUD
@@ -319,7 +327,7 @@ ObjectGroup02_PatTableSel:
     ; See Object_DoKillAction for the jump table
     ; NOTE: Any action type other than zero always sets the frame to 2 (unless object is not general purpose, i.e. index >= 5)
 
-    .base ObjectGroup_KillAction ; <-- help enforce this table *here*
+.assert * = ObjectGroup_KillAction, error, "ObjectGroup_KillAction must be at $A168"
 ObjectGroup02_KillAction:
     .byte KILLACT_JUSTDRAW16X16 ; Object $48 - OBJ_TINYCHEEPCHEEP
     .byte KILLACT_STANDARD  ; Object $49 - OBJ_FLOATINGBGCLOUD
@@ -363,7 +371,7 @@ ObjectGroup02_KillAction:
     ; These are used for all states except "normal"
 
 
-    .base ObjectGroup_PatternStarts  ; <-- help enforce this table *here*
+.assert * = ObjectGroup_PatternStarts, error, "ObjectGroup_PatternStarts must be at $A18C"
 ObjectGroup02_PatternStarts:
     ; Index by object group relative index (ObjGroupRel_Idx)
     .byte ObjP48 - ObjectGroup02_PatternSets, ObjP49 - ObjectGroup02_PatternSets, ObjP4A - ObjectGroup02_PatternSets, ObjP4B - ObjectGroup02_PatternSets
@@ -388,7 +396,7 @@ ObjectGroup02_PatternStarts:
     ; valid JMP $xxxx instruction to go to an alternate giant shell
     ; drawing routine (since otherwise default code is used)
 
-    .base ObjectGroup_PatternSets    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_PatternSets, error, "ObjectGroup_PatternSets must be at $A1B0"
 ObjectGroup02_PatternSets:
     ; (End restricted alignment space)
 
@@ -521,7 +529,7 @@ PRG003_A2DB:
     INC Objects_Var4,X
 
     ; Item Y velocity
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel,X
 
     JSR TreasureBox_Poof     ; Do another poof on opening
@@ -703,8 +711,8 @@ PRG003_A3C2:
     LDA Objects_YVel,X
     BPL PRG003_A3CD  ; If Podoboo is moving downward, jump to PRG003_A3CD
 
-    CMP #-$6F
-    BLT PRG003_A3D2  ; If Podoboo is not moving upward faster than -$6F, jump to PRG003_A3D2
+    CMP #<-$6F
+    BLT PRG003_A3D2  ; If Podoboo is not moving upward faster than <-$6F, jump to PRG003_A3D2
 
 PRG003_A3CD:
     SEC
@@ -721,7 +729,7 @@ ObjInit_PileDriver:
     RTS      ; Return
 
 
-PileDriver_TowardsPlayerXVel:   .byte $10, -$10
+PileDriver_TowardsPlayerXVel:   .byte $10, <-$10
 
     ; Runs compare against object's state to see if it's state 2 (Normal)
 Object_CheckIfNormalState:
@@ -730,7 +738,7 @@ Object_CheckIfNormalState:
     RTS      ; Return
 
 
-ObjNorm_PileDriver
+ObjNorm_PileDriver:
     JSR Object_CheckIfNormalState
     BEQ PRG003_A3E9  ; If in normal state, jump to PRG003_A3E9
 
@@ -753,7 +761,7 @@ PRG003_A3F3:
     BNE PRG003_A424  ; If Var5 <> 0, jump to PRG003_A424
 
     ; Piledriver jumps!
-    LDA #-$60
+    LDA #<-$60
     STA Objects_YVel,X
 
     ; Timer set to $70
@@ -964,7 +972,7 @@ Piledriver_YOff:    .byte $01, $00, $02, $04, $05, $02
 
     ; "Bust block" is an ice block that smashed into wall or a Microgoomba brick getting busted
     ; First four are the brick bits, the last is the microgoomba
-BustBlock_YOffByInput:  .byte -$04, -$04, $04, $04, $00
+BustBlock_YOffByInput:  .byte <-$04, <-$04, $04, $04, $00
 BustBlock_YHiOffByInput:    .byte  $FF,  $FF, $00, $00, $00
 PRG003_A502:    .byte $00, $08, $00, $08, $04
 BustBlock_YVelByInput:  .byte $C0, $C0, $D0, $D0, $D0
@@ -1038,7 +1046,7 @@ PRG003_A54E:
 PRG003_A567:
     RTS      ; Return
 
-Twirler_InitXVel:   .byte $08, -$08
+Twirler_InitXVel:   .byte $08, <-$08
 
 ObjInit_Twirling:
     JSR Level_ObjCalcXDiffs
@@ -1095,8 +1103,8 @@ PRG003_A5A3:
 
     JSR Object_ApplyXVel     ; Apply X velocity
 
-    ; Maintain Y Velocity = -$01 (sticks to ceiling)
-    LDA #-$01
+    ; Maintain Y Velocity = <-$01 (sticks to ceiling)
+    LDA #<-$01
     STA Objects_YVel,X
 
     JSR Object_WorldDetectN1 ; Detect against world
@@ -1306,10 +1314,10 @@ DonutLift_ChangeBlock:
     RTS      ; Return
 
     ; Bob-omb's starting X velocity depending on where Player is
-BobOmb_StartXVel:   .byte $08, -$08
+BobOmb_StartXVel:   .byte $08, <-$08
 
     ; Bob-omb's starting X velocity depending on where Player is
-BobOmbExp_StartXVel:    .byte $10, -$10
+BobOmbExp_StartXVel:    .byte $10, <-$10
 
 ObjInit_BobOmb:
     JSR Level_ObjCalcXDiffs
@@ -1380,7 +1388,7 @@ PRG003_A6FF:
     AND #$04
     BEQ PRG003_A730  ; If Bob-omb's not on the ground, jump to PRG003_A730
 
-    LDA #-$20
+    LDA #<-$20
     STA Objects_YVel,X
 
     LDY #$00     ; Y = 0
@@ -1441,7 +1449,7 @@ PRG003_A74B:
     STA Objects_Timer2,X
 
     ; Little bounce for the Player
-    LDA #-$30
+    LDA #<-$30
     STA Player_YVel
 
     JMP PRG003_A7FE  ; Just do Bob-omb death
@@ -1580,7 +1588,7 @@ PRG003_A7F0:
 
 BobOmb_Kill:
     ; Player bounces
-    LDA #-$30
+    LDA #<-$30
     STA Player_YVel
 
     ; Set Bob-omb state to Killed
@@ -1588,7 +1596,7 @@ BobOmb_Kill:
     STA Objects_State,X
 
     ; A little bounce from the Bob-omb
-    LDA #-$10
+    LDA #<-$10
     STA Objects_YVel,X
 
 PRG003_A7FE:
@@ -1604,8 +1612,8 @@ PRG003_A7FE:
     RTS      ; Return
 
     ; X and Y offsets for the exploding Bob-omb stars
-BombStars_XOff: .byte -$04, $04, $08, $04, -$04, -$08, $00, $08, $08, $00, -$08, -$08
-BombStars_YOff: .byte -$08, -$08, $00, $08, $08, $00, $08, $04, -$04, -$08, -$04, $04
+BombStars_XOff: .byte <-$04, $04, $08, $04, <-$04, <-$08, $00, $08, $08, $00, <-$08, <-$08
+BombStars_YOff: .byte <-$08, <-$08, $00, $08, $08, $00, $08, $04, <-$04, <-$08, <-$04, $04
 
 BobOmb_DoExplosion:
     LDA Player_HaltGame
@@ -1731,7 +1739,7 @@ PRG003_A89D:
     STA Objects_State,Y
 
     ; Killed object bounces up a bit
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel,Y
 
     ; Halt horizontal movement
@@ -1993,10 +2001,10 @@ ObjInit_BoomBoom:
 ObjInit_FloatingBGCloud:
     RTS      ; Return
 
-BoomBoom_TowardsPlayerXVel: .byte $10, -$10
+BoomBoom_TowardsPlayerXVel: .byte $10, <-$10
 
 BoomBoom_FinalAttackXVel:
-    .byte $20, -$20, $18, -$18  ; First two values are for any world besides World 1, last two are World 1 only
+    .byte $20, <-$20, $18, <-$18  ; First two values are for any world besides World 1, last two are World 1 only
 
 BoomBoom_GetupFrames:
     .byte $0A, $06, $07, $07, $07, $07, $06, $0A, $10, $14
@@ -2128,7 +2136,7 @@ PRG003_AA92:
     BNE PRG003_AABC  ; If Var6 <> $10, jump to PRG003_AABC
 
     ; Boom Boom hops a bit when he gets up
-    LDA #-$2D
+    LDA #<-$2D
     STA Objects_YVel,X
 
     LDA Objects_Var2,X
@@ -2233,10 +2241,10 @@ BoomBoom_Unused:
     INC Objects_Var5,X  ; Just jumps to state 2
     RTS      ; Return
 
-BoomBoom_XVelLimit: .byte $10, -$10 ; Boom Boom primary attack limits
-BoomBoom_XVelFastLimit: .byte $30, -$30 ; Boom Boom final attack limits
-BoomBoom_XVelAccel: .byte $01, -$01 ; Boom Boom primary attack acceleration
-BoomBoom_XVelFastAccel: .byte $02, -$02 ; Boom Boom final attack acceleration
+BoomBoom_XVelLimit: .byte $10, <-$10 ; Boom Boom primary attack limits
+BoomBoom_XVelFastLimit: .byte $30, <-$30 ; Boom Boom final attack limits
+BoomBoom_XVelAccel: .byte $01, <-$01 ; Boom Boom primary attack acceleration
+BoomBoom_XVelFastAccel: .byte $02, <-$02 ; Boom Boom final attack acceleration
 
 BoomBoom_PrimaryAttack:
     LDA Objects_Var2,X
@@ -2291,7 +2299,7 @@ PRG003_AB52:
 
     JMP PRG003_AA92  ; Jump to PRG003_AA92
 
-BoomBoom_XVelSlide: .byte $20, -$20
+BoomBoom_XVelSlide: .byte $20, <-$20
 
 PRG003_AB6C:
     AND #$3f
@@ -2430,7 +2438,7 @@ PRG003_AC00:
     BNE PRG003_AC11  ; If Var7 <> 0, jump to PRG003_AC11
 
     ; Boom Boom's jump!
-    LDA #-$60
+    LDA #<-$60
     STA Objects_YVel,X
 
     JSR BoomBoom_SetXVelTowardsPlayer    ; Jump towards Player
@@ -2511,9 +2519,9 @@ BoomBoom_SetXVelTowardsPlayer:
 PRG003_AC69:
     RTS      ; Return
 
-BoomBoom_FlyXVelLimit:  .byte $20, -$20
-BoomBoom_FlyAccel:  .byte $01, -$01
-BoomBoom_FlyYVelAccel:  .byte $10, -$10
+BoomBoom_FlyXVelLimit:  .byte $20, <-$20
+BoomBoom_FlyAccel:  .byte $01, <-$01
+BoomBoom_FlyYVelAccel:  .byte $10, <-$10
 
 PRG003_AC70:
 
@@ -2859,8 +2867,8 @@ PRG003_AE50:
     ADC #$07
     JSR Score_PopUp
 
-    ; Player Y Vel = -$30 (bounce off)
-    LDA #-$30
+    ; Player Y Vel = <-$30 (bounce off)
+    LDA #<-$30
     STA Player_YVel
 
     LDA Objects_Var5,X
@@ -2947,7 +2955,7 @@ PRG003_AE95:
     STA Objects_Frame,X ; Frame = 0
 
     ; Ball bounces up a bit
-    LDA #-$38
+    LDA #<-$38
     STA Objects_YVel,X
 
     ; Play ba-boom sound
@@ -2965,8 +2973,8 @@ PRG003_AEE3:
     RTS      ; Return
 
 Star_Vel:
-    .byte -$20, -$17, $00, $17, $20, $17, $00, -$17
-Star_VelEnd
+    .byte <-$20, <-$17, $00, $17, $20, $17, $00, <-$17
+Star_VelEnd:
 
 Explode_Stars:
     LDY #Star_VelEnd - Star_Vel - 1
@@ -3082,7 +3090,7 @@ SidePiranha_Emerge:
     CMP Objects_X,X
     BGE PRG003_AF95  ; If (Var5 - 25) >= Piranha's X, jump to PRG003_AF95
 
-    LDA #-$10   ; Leftward moving piranha
+    LDA #<-$10   ; Leftward moving piranha
     BNE PRG003_AF8B  ; Jump (technically always) to PRG003_AF8B
 
 SidePiranha_Receed:
@@ -3419,7 +3427,7 @@ ObjInit_LavaLotus:
 ObjInit_WaterCurrent:
     RTS      ; Return
 
-CurrentUpward_YAccel:   .byte -$03, -$03, -$02, -$01, $00, $00, $00, $00, $00
+CurrentUpward_YAccel:   .byte <-$03, <-$03, <-$02, <-$01, $00, $00, $00, $00, $00
 CurrentDownward_YAccel: .byte  $03,  $02,  $01,  $00, $00, $00, $00, $00, $00
 
 ObjNorm_WaterCurrent:
@@ -3483,8 +3491,8 @@ PRG003_B177:
     BNE PRG003_B18C  ; If Player just hit off ceiling, jump to PRG003_B18C
 
     LDA Player_YVel
-    CMP #-$3C
-    BMI PRG003_B18C  ; If Player's Y velocity is already moving faster than -$3C, jump to PRG003_B18C
+    CMP #<-$3C
+    BMI PRG003_B18C  ; If Player's Y velocity is already moving faster than <-$3C, jump to PRG003_B18C
 
     CLC
     ADC CurrentUpward_YAccel,Y   ; Push Player upward
@@ -3547,8 +3555,8 @@ Current_GenerateBubble:
     SBC #$00
     STA SpecialObj_YHi,Y
 
-    ; Bubble's Y velocity = -$80
-    LDA #-$80
+    ; Bubble's Y velocity = <-$80
+    LDA #<-$80
     STA SpecialObj_YVel,Y
 
     RTS      ; Return
@@ -3581,9 +3589,9 @@ ObjInit_BigBerthaBirther:
 PRG003_B1F6:
     RTS      ; Return
 
-BigBerthaLCC_XVelAccel:     .byte $01, -$01
-BigBerthaLCC_XVelLimit:     .byte $18, -$18
-BigBerthaLCC_XVelLowLimit:  .byte $08, -$08
+BigBerthaLCC_XVelAccel:     .byte $01, <-$01
+BigBerthaLCC_XVelLimit:     .byte $18, <-$18
+BigBerthaLCC_XVelLowLimit:  .byte $08, <-$08
 
 ObjNorm_BigBerthaBirther:
     JSR Object_CheckIfNormalState
@@ -3611,10 +3619,10 @@ PRG003_B205:
     AND #$40
     BEQ PRG003_B227  ; 64 ticks on, 64 ticks off; jump to PRG003_B227
 
-    LDY #-$02    ; Y = -$02
+    LDY #<-$02    ; Y = <-$02
 
 PRG003_B227:
-    STY Objects_YVel,X  ; Y Velocity = $02 or -$02
+    STY Objects_YVel,X  ; Y Velocity = $02 or <-$02
 
     LDA Objects_Timer,X
     BEQ PRG003_B250  ; If timer expired, jump to PRG003_B250
@@ -3649,7 +3657,7 @@ PRG003_B249:
 PRG003_B24B:
     RTS      ; Return
 
-BigBertha_XMove:    .byte -$10, $10
+BigBertha_XMove:    .byte <-$10, $10
 BigBertha_XHiMove:  .byte $FF, $00
 
 PRG003_B250:
@@ -3837,7 +3845,7 @@ PRG003_B32B:
 PRG003_B341:
     RTS      ; Return
 
-TinyCheep_XVel: .byte -$28, $28
+TinyCheep_XVel: .byte <-$28, $28
 TinyCheep_XOff: .byte $00, $08
 TinyCheep_Flip: .byte $00, SPR_HFLIP
 
@@ -3922,7 +3930,7 @@ PRG003_B37D:
 
     RTS      ; Return
 
-TinyCheepCheep_XVelLimit:   .byte $08, -$08
+TinyCheepCheep_XVelLimit:   .byte $08, <-$08
 PRG003_B3B0:    .byte $FF, $01
 
 ObjNorm_TinyCheepCheep:
@@ -3944,7 +3952,7 @@ ObjNorm_TinyCheepCheep:
     AND #$10
     BEQ PRG003_B3CD  ; Every 1:16 ticks, jump to PRG003_B3CD
 
-    LDY #-$02    ; Y = -$02
+    LDY #<-$02    ; Y = <-$02
 
 PRG003_B3CD:
     STY Objects_YVel,X  ; Set Y velocity
@@ -4008,7 +4016,7 @@ PRG003_B41E:
     LDY Temp_Var1   ; Y = Temp_Var1
     BMI PRG003_B426  ; If Temp_Var1 (difference) is negative, jump to PRG003_B426
 
-    LDA #-$08    ; A = -$08
+    LDA #<-$08    ; A = <-$08
 
 PRG003_B426:
     CLC
@@ -4023,7 +4031,7 @@ PRG003_B42E:
     LDY Objects_FlipBits,X
     BNE PRG003_B437  ; If not horizontally flipped, jump to PRG003_B437
 
-    LDA #-$08    ; A = -$08
+    LDA #<-$08    ; A = <-$08
 
 PRG003_B437:
     STA Objects_XVel,X  ; Update X Velocity
@@ -4031,7 +4039,7 @@ PRG003_B437:
 PRG003_B439:
     JMP Object_ShakeAndDraw ; Draw object and don't come back!
 
-CheepCheepHopper_InitXVel:  .byte $0C, -$0C
+CheepCheepHopper_InitXVel:  .byte $0C, <-$0C
 
 ObjInit_CheepCheepHopper:
     JSR Level_ObjCalcXDiffs
@@ -4060,7 +4068,7 @@ ObjNorm_CheepCheepHopper:
 
     JSR Level_ObjCalcXDiffs
 
-    LDY #-$30    ; Y = -$30
+    LDY #<-$30    ; Y = <-$30
 
     LDA Temp_Var16
     CLC
@@ -4068,7 +4076,7 @@ ObjNorm_CheepCheepHopper:
     CMP #$80
     BGE PRG003_B46F  ; If Cheep Cheep is not close enough to Player, jump to PRG003_B46F
 
-    LDY #-$60    ; Otherwise, Y = -$60
+    LDY #<-$60    ; Otherwise, Y = <-$60
 PRG003_B46F:
     STY Objects_YVel,X  ; Update Y velocity
 
@@ -4084,7 +4092,7 @@ PRG003_B471:
 PRG003_B47A:
     RTS      ; Return
 
-Tornado_InitXVel:   .byte $08, -$08
+Tornado_InitXVel:   .byte $08, <-$08
 
 ObjInit_Tornado:
     JSR Level_ObjCalcXDiffs
@@ -4287,7 +4295,7 @@ PRG003_B5D3:
     STA Player_InAir ; Flag Player as mid-air
 
     ; Upward Player!
-    LDA #-$20
+    LDA #<-$20
     STA Player_YVel
 
     ; Var6 = last set Player Y velocity
@@ -4333,15 +4341,15 @@ PRG003_B604:
 PRG003_B61C:
     RTS      ; Return
 
-Tornado_PlayerYLimit:   .byte $40, -$40
-Tornado_PlayerYAccel:   .byte $04, -$04
-Tornado_PlayerXVelAdj:  .byte -$08, $08
+Tornado_PlayerYLimit:   .byte $40, <-$40
+Tornado_PlayerYAccel:   .byte $04, <-$04
+Tornado_PlayerXVelAdj:  .byte <-$08, $08
 
 Tornado_PlayerXVelAdj2:
     .byte $18, $10, $0A, $06, $00, $00, $00, $00
 
 Tornado_PlayerYVelAccelByRow:
-    .byte $10, $04, -$08, -$08, -$08, -$08, -$08, -$08, -$02, -$02, -$02, -$02, $10, $10, $10, $10
+    .byte $10, $04, <-$08, <-$08, <-$08, <-$08, <-$08, <-$08, <-$02, <-$02, <-$02, <-$02, $10, $10, $10, $10
 
 Tornado_ScatterParticle:
     TXA
@@ -4591,10 +4599,10 @@ ObjInit_BlooperWithKids:
     RTS      ; Return
 
 Blooper_YVelAccel:
-    .byte $02, -$02
+    .byte $02, <-$02
 
 Blooper_YVelLimit:
-    .byte $24, -$24
+    .byte $24, <-$24
 
 PRG003_B763:
     .byte $00, $10, $00, $01, $FF
@@ -4690,7 +4698,7 @@ PRG003_B7CF:
 PRG003_B7D2:
     JSR Level_ObjCalcXDiffs
 
-PRG003_B7D5
+PRG003_B7D5:
     ; Blooper faces Player
     LDA Blooper_FlipTowardsPlayer,Y
     STA Objects_FlipBits,X
@@ -4921,8 +4929,8 @@ PRG003_B8E9:
     CLC      ; Clear carry
     RTS      ; Return
 
-Chomp_JumpYVels:    .byte -$40, -$60
-Chomp_XVels:        .byte $30, -$30
+Chomp_JumpYVels:    .byte <-$40, <-$60
+Chomp_XVels:        .byte $30, <-$30
 
 ObjNorm_ChainChompFree:
     JSR Object_CheckIfNormalState
@@ -5161,13 +5169,13 @@ Enemy_DeleteIfOffAndDrawTail:
     JSR Object_DeleteOffScreen   ; Delete object if it falls too far off-screen
     JMP Tail_DrawAndHurtPlayer   ; Jump to Tail_DrawAndHurtPlayer
 
-FireChomp_XVelLimit:    .byte $0A, -$0A, $10, -$10
-FireChomp_XVelAccel:    .byte $01, -$01, $01, -$01
+FireChomp_XVelLimit:    .byte $0A, <-$0A, $10, <-$10
+FireChomp_XVelAccel:    .byte $01, <-$01, $01, <-$01
 
 FireChomp_FlipTowardsPlayer:    .byte SPR_HFLIP, $00
 
-FireChomp_YVelLimit:    .byte $12, -$12
-FireChomp_YVelAccel:    .byte $01, -$01
+FireChomp_YVelLimit:    .byte $12, <-$12
+FireChomp_YVelAccel:    .byte $01, <-$01
 
 FireChomp_MoveAndExplodeDeath:
     LDA Objects_Var4,X
@@ -5586,7 +5594,7 @@ RotoDiscSpin:
     INC Objects_Var3,X  ; Var3++
 
     LDA Objects_Var3,X  ; A = Var3
-    AND PRG003_B9BB-1,Y ; -1 because Y will always be at least 1
+    AND PRG003_B9BB-1,Y ; <-1 because Y will always be at least 1
     BNE PRG003_BC6D     ; If masking of Var3 is non-zero, jump to PRG003_BC6D (RTS)
 
     LDA Objects_Var4,X
@@ -5864,12 +5872,12 @@ Player_HurtIfNotDieOffBehind:
 PRG003_BD60:
     RTS      ; Return
 
-FireSnake_XVelTowardsPlayer:    .byte $08, -$08
+FireSnake_XVelTowardsPlayer:    .byte $08, <-$08
 
 FireSnake_FlipForTick:  .byte $00, $00, SPR_HFLIP, SPR_HFLIP
 FireSnake_FrameForTick: .byte $00, $01, $00, $01
 
-FireSnake_JumpYVel: .byte -$18, -$24
+FireSnake_JumpYVel: .byte <-$18, <-$24
 
 FireSnake_RandomTimer3Vals: .byte $50, $70, $00, $70, $50, $00, $00, $00
 
@@ -6052,7 +6060,7 @@ TailEnemy_DoDeath:
     LSR Objects_FlipBits,X
 
     ; Little hop upward
-    LDA #-$10
+    LDA #<-$10
     STA Objects_YVel,X
 
     JMP PRG003_BE37 ; Draw tail, Do NOT return to caller, and don't come back!
@@ -6086,10 +6094,10 @@ PRG003_BE6B:
     AND #$08
     BEQ PRG003_BE76  ; 8 ticks on, 8 ticks off; jump to PRG003_BE76
 
-    LDY #-$08    ; Y = -$08
+    LDY #<-$08    ; Y = <-$08
 
 PRG003_BE76:
-    STY Objects_XVel,X  ; Set X velocity as $08 or -$08
+    STY Objects_XVel,X  ; Set X velocity as $08 or <-$08
 
     JMP PRG003_BE37 ; Draw tail, Do NOT return to caller, and don't come back!
 
@@ -6099,14 +6107,14 @@ ObjInit_RotoDiscDualCW:
     BNE PRG003_BE87  ; Jump (technically always) to PRG003_BE87
 
 ObjInit_RotoDiscDualCCW:
-    LDY #-$02   ; Y = -$02
+    LDY #<-$02   ; Y = <-$02
 
     ; Set initial Y velocity
     LDA PRG003_B9C6
 
 PRG003_BE87:
     STA Objects_YVel,X
-    STY Temp_Var1   ; Temp_Var1 = -$02
+    STY Temp_Var1   ; Temp_Var1 = <-$02
 
     LDA #$00
     STA Objects_XVel,X

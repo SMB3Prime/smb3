@@ -11,15 +11,16 @@
 ; This source file last updated: 2012-03-28 13:51:54.652889989 -0500
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
 
-; Some constants specific to title screen; they don't really match up with the gameplay
-FALL_NORMAL     = 5 ; Normal fall rate added to 'Y'
-FALL_TAILWAG        = 1 ; Adjusted fall rate for when wagging raccoon tail
-FALL_OBJECT     = 4 ; Fall rate for objects
+.include "smb3.inc"
 
-FALLRATE_TAILWAGMAX = 8 ; Maximum Y velocity falling rate when wagging raccoon tail
-FALLRATE_MAX        = $40   ; Maximum Y velocity falling rate
-FALLRATE_OBJECTMAX  = $60   ; Maximum Y velocity falling rate of an object
+.segment "PRG_24"
+
+.export Cinematic_ToadAndKing, DiagBox_RowOffs
+.export DiagBox_RowOffs_End, Do_Ending2_IntCmd, Do_Title_Screen
+.export IntIRQ_TitleEnding
+.export Rescue_Princess
 
 Cinematic_ToadAndKing:
     LDA Cine_ToadKing
@@ -103,7 +104,7 @@ DiagBox_R3: .byte $95, $91, $91, $91, $91, $91, $91, $91, $91, $91, $91, $91, $9
 DiagBox_RowOffs:
     .byte (DiagBox_R1 - DiagBox_R1), (DiagBox_R2 - DiagBox_R1), (DiagBox_R2 - DiagBox_R1), (DiagBox_R2 - DiagBox_R1)
     .byte (DiagBox_R2 - DiagBox_R1), (DiagBox_R2 - DiagBox_R1), (DiagBox_R2 - DiagBox_R1), (DiagBox_R3 - DiagBox_R1)
-DiagBox_RowOffs_End
+DiagBox_RowOffs_End:
 
 TAndK_DrawDiagBox:
     LDA CineKing_Timer
@@ -393,7 +394,7 @@ King_W3Pat0:    .byte $C1, $C3, $C5, $C7, $C9
 
     ; World 6 King is a seal juggling a crown (indexed by CineKing_Frame2)
 King_W6Crown_YOff:  .byte $06, $04, $0A, $09, $09, $02, $04, $06
-King_W6Crown_Pattern:   .byte -5, -3, -3, -5, -3, -3, -5, -5
+King_W6Crown_Pattern:   .byte <-5, <-3, <-3, <-5, <-3, <-3, <-5, <-5
 King_W6Crown_Attr:
     .byte SPR_PAL3, SPR_PAL3, SPR_PAL3 | SPR_VFLIP, SPR_PAL3 | SPR_VFLIP, SPR_PAL3 | SPR_HFLIP | SPR_VFLIP
     .byte SPR_PAL3 | SPR_HFLIP, SPR_PAL3, SPR_PAL3
@@ -409,7 +410,7 @@ KingToad_Sprites:
     .byte $70, $00, $01, $B8
     .byte $70, $00, $01, $B0
     .byte $70, $00, $01, $A8
-KingToad_Sprites_End
+KingToad_Sprites_End:
 
 KingToad_Patterns:
 ToadFrame0: .byte $A1, $A3, $A5, $A7, $A9, $AB
@@ -693,7 +694,7 @@ King_W6:
 
     RTS      ; Return
 
-King_YDelta:    .byte $01, -$01, $01
+King_YDelta:    .byte $01, <-$01, $01
 King_W2_YLimit: .byte $70, $68
 
 King_W2:
@@ -821,15 +822,15 @@ PRG024_A548:        ; <-- originally PRG022_C548        ; UNUSED COPY FROM PRG02
     .byte PLAYERSUIT_SMALL      ; 2     ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
 ; PlayerSuit_TileBaseIndex:     ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
-    .byte (Player_BonusTiles_Big - Player_BonusTiles_Big)       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
-    .byte (Player_BonusTiles_Raccoon - Player_BonusTiles_Big)       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
-    .byte (Player_BonusTiles_Small - Player_BonusTiles_Big)     ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    .byte <(Player_BonusTiles_Big - Player_BonusTiles_Big)       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    .byte <(Player_BonusTiles_Raccoon - Player_BonusTiles_Big)       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    .byte <(Player_BonusTiles_Small - Player_BonusTiles_Big)     ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
 ; LoadLevel_BonusPlayer:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     ; This loop tries to match the Player's power up with an index      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     ; If nothing else, X = 0, which uses "Big"      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
-    LDX #PlayerSuit_ToIndex_End - PlayerSuit_ToIndex - 1      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    LDX #<(PlayerSuit_ToIndex_End - PlayerSuit_ToIndex - 1)      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     LDY Player_Current  ; Y = Player_Current        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     LDA World_Map_Power,Y   ; Get current Player's power        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 PRG024_A589:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
@@ -877,7 +878,7 @@ PRG024_A5A0:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     TAY      ; -> 'Y'       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     LDA Temp_Var3      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
-    CMP #Player_BonusTiles_Raccoon - Player_BonusTiles_Big        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    CMP #<(Player_BonusTiles_Raccoon - Player_BonusTiles_Big)        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     BNE PRG024_A59C  ; If we have more tiles to go, loop!       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     RTS      ; Return       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
@@ -914,7 +915,7 @@ PRG024_A5CF:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     STA TileAddr_Off        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     TAY      ; -> 'Y'       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
-    CPX #BonusUNKTALL_Tiles_End - BonusUNKTALL_Tiles      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    CPX #<(BonusUNKTALL_Tiles_End - BonusUNKTALL_Tiles)      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     BNE PRG024_A5CB  ; While X < number of tiles, loop!     ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     RTS      ; Return       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
@@ -1015,7 +1016,7 @@ PRG024_A633:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     STA TileAddr_Off        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     TAY      ; -> 'Y'       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
-    CPX #QBoxOrange_Tiles_End - QBoxOrange_Tiles      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    CPX #<(QBoxOrange_Tiles_End - QBoxOrange_Tiles)      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     BNE PRG024_A62F ; While tiles to go, loop!      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     RTS      ; Return       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
@@ -1052,7 +1053,7 @@ PRG024_A65A:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     STA TileAddr_Off        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     TAY      ; -> 'Y'       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
-    CPX #QBoxBlue_Tiles_End - QBoxBlue_Tiles      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    CPX #<(QBoxBlue_Tiles_End - QBoxBlue_Tiles)      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     BNE PRG024_A656 ; While tiles to go, loop!      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     RTS      ; Return       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
@@ -1205,7 +1206,7 @@ PRG024_A6E2:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     STA Temp_Var11     ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     LDY #$00     ; Y = 0        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
-    LDX #HostToad_SpriteYs_End - HostToad_SpriteYs - 1        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    LDX #<(HostToad_SpriteYs_End - HostToad_SpriteYs - 1)        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 PRG024_A727:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     ; Set Sprite Y of this sprite of the Toad Host      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
@@ -1254,7 +1255,7 @@ PRG024_A727:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     STA Temp_Var11     ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     LDY #$00     ; Y = 0        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
-    LDX #HostTroopa_SpriteYs_End - HostTroopa_SpriteYs - 1        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    LDX #<(HostTroopa_SpriteYs_End - HostTroopa_SpriteYs - 1)        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 PRG024_A765:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     ; Set Sprite Y of this sprite of the Koopa Troopa Host      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
@@ -1304,7 +1305,7 @@ PRG024_A765:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     STA Temp_Var11     ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     LDY #$00     ; Y = 0        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
-    LDX #HostHammerBro_SpriteYs_End - HostHammerBro_SpriteYs - 1      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    LDX #<(HostHammerBro_SpriteYs_End - HostHammerBro_SpriteYs - 1)      ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 PRG024_A7A5:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     ; Set Sprite Y of this sprite of the Hammer Bro Host        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
     LDA HostHammerBro_SpriteYs,X        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
@@ -1357,7 +1358,7 @@ PRG024_A7A5:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     ; Draw the game box first       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
-    LDX #BonusGameBox_SpriteYs_End - BonusGameBox_SpriteYs - 1        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
+    LDX #<(BonusGameBox_SpriteYs_End - BonusGameBox_SpriteYs - 1)        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 PRG024_A7E1:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 
     ; Set Sprite Y of this sprite       ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
@@ -1395,7 +1396,7 @@ PRG024_A7E1:        ; UNUSED COPY FROM PRG022, DELETE DON'T MODIFY
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-Debug_DownUp:   .byte 1, -1 ; Add 1 or subtract 1 from current world on debug menu
+Debug_DownUp:   .byte 1, <-1 ; Add 1 or subtract 1 from current world on debug menu
 
 ; $A802
     .byte $02, $FF, $00, $01
@@ -2771,10 +2772,10 @@ PRG024_AF23:
     ; The XHi is less than zero...
 
     LDA Title_ObjX,X       ; Get the X coordinate
-    CMP #-64
-    BGE PRG024_AF3D         ; If the X coordinate is >= -64, jump to PRG024_AF3D
+    CMP #<-64
+    BGE PRG024_AF3D         ; If the X coordinate is >= <-64, jump to PRG024_AF3D
 
-    ; Don't let the X coordinate go below -64
+    ; Don't let the X coordinate go below <-64
     LDA #$c0
     BNE PRG024_AF3B         ; Jump (technically always) to PRG024_AF3B
 
@@ -2827,7 +2828,7 @@ PRG024_AF48:
     RTS      ; Return
 
 PRG024_AF67:
-    .byte -1, 0, 1
+    .byte <-1, 0, 1
 
     ; Values added to Title_MLAccelCnt
 Title_MLAccelFactors:
@@ -3002,8 +3003,8 @@ PRG024_B023:
     LDY #FALL_NORMAL    ; Y = FALL_NORMAL (normal falling rate)
 
     LDA Title_ObjYVel,X    ; Get the Y velocity
-    CMP #-32
-    BGS PRG024_B037     ; If Y velocity >= -32, jump to PRG024_B037
+    CMP #<-32
+    BGS PRG024_B037     ; If Y velocity >= <-32, jump to PRG024_B037
 
     LDA Title_ObjMLDir,X   ; Get the direction vector
     AND #$80
@@ -3097,7 +3098,7 @@ Title_AddVel_toPos:
     BLT PRG024_B088     ; If (velocity >> 4) < 8, jump to PRG024_B088 (detects a negative source value, because there's on ASR type instruction)
 
     ; (velocity >> 4) >= 8 ... (velocity is negative)
-    DEY         ; Y-- (Y = -1)
+    DEY         ; Y-- (Y = <-1)
     ORA #$f0        ; Simulates carrying the negative sign bit across the value, like an ASR instruction would
 
 PRG024_B088:
@@ -3300,7 +3301,7 @@ PRG024_B135:
     INY             ; Otherwise increment Y
 PRG024_B14E:
 
-    LDA #-96            ; Luigi's bounce velocity
+    LDA #<-96            ; Luigi's bounce velocity
     STA Title_ObjYVelChng,Y     ; Store the change in velocity
     STA Title_ObjYVel,Y     ; And set the velocity
 
@@ -3617,7 +3618,7 @@ PRG024_B27E:
     ; Reverse X coordinates
     LDA Sprite_RAM+$0B,X
     CLC
-    ADC #-24
+    ADC #<-24
     STA Sprite_RAM+$0B,X
     STA Sprite_RAM+$17,X
 
@@ -3656,7 +3657,7 @@ PRG024_B2DE:
     STA Sprite_RAM+$14,X     ; Match the Y coordinate
 
     ; Facing left, foot is to the left
-    LDA #-8         ; A = -8
+    LDA #<-8         ; A = <-8
 
     ; This refers to whether Mario / Luigi is horizontally flipped, but seems wrong?
     ; Should only check if NOT h-flipped?
@@ -3723,7 +3724,7 @@ Title_MLSpriteVis_XHiOff:
 
 Title_MLSpriteVis_XOff:
     .byte 0, 8, 16      ; Not H-Flipped
-    .byte 0, 8, -8      ; H-Flipped
+    .byte 0, 8, <-8      ; H-Flipped
 
 Title_MLSpriteVis_BitVal:
     ; Bit vals to mark which slivers NOT to display
@@ -3964,8 +3965,8 @@ Title_DoStarman:
     ; Otherwise...
     LDA #$20
     STA Title_ObjXVel+2,X   ; X velocity set to $20 (initial bounce, bounces away)
-    LDA #-80
-    STA Title_ObjYVel+2,X   ; Y velocity set to -80 (bounce)
+    LDA #<-80
+    STA Title_ObjYVel+2,X   ; Y velocity set to <-80 (bounce)
 
 PRG024_B43E:
     JSR Title_ObjDraw       ; Draw the starman!
@@ -3983,9 +3984,9 @@ PRG024_B44D:
     JSR Title_ObjDraw       ; Draw the mushroom!
     JMP Title_ObjCommonFinale   ; Do common finale code
 
-Title_Leaf_XVelAdj: .byte 2, -2     ; X velocity applied to leaf
-Title_Leaf_XVelLimit:   .byte 32, -32       ; X velocity limits for leaf to swing the other way
-Title_Leaf_YVel:    .byte 10, -10, 8    ; Y velocities assigned for leaf swinging
+Title_Leaf_XVelAdj: .byte 2, <-2     ; X velocity applied to leaf
+Title_Leaf_XVelLimit:   .byte 32, <-32       ; X velocity limits for leaf to swing the other way
+Title_Leaf_YVel:    .byte 10, <-10, 8    ; Y velocities assigned for leaf swinging
 
 Title_DoLeaf:
     LDA Title_ObjVar,X
@@ -4121,8 +4122,8 @@ PRG024_B4E8:
     ; Mario's "stomping" on the goomba
     LDA #$00
     STA Title_ObjXVel+2,X  ; GOOMBA'S X velocity = 0
-    LDA #-48
-    STA Title_ObjYVel  ; MARIO's Y velocity = -48
+    LDA #<-48
+    STA Title_ObjYVel  ; MARIO's Y velocity = <-48
 
 PRG024_B4F4:
     LDA #$01
@@ -4131,8 +4132,8 @@ PRG024_B4F4:
     JMP Title_ObjDraw   ; Draw goomba...
 
 PRG024_B4FC:
-    LDA #-8
-    STA Title_ObjXVel+2,X  ; Goomba X Velocity = -8 (march left)
+    LDA #<-8
+    STA Title_ObjXVel+2,X  ; Goomba X Velocity = <-8 (march left)
 
 PRG024_B500:
     LDA Counter_1
@@ -4167,8 +4168,8 @@ PRG024_B51D:
     LDA #16
     STA Title_ObjXVel+2,X  ; X velocity = 16
 
-    LDA #-64
-    STA Title_ObjYVel+2,X  ; Y velocity = -64
+    LDA #<-64
+    STA Title_ObjYVel+2,X  ; Y velocity = <-64
 
     LDA #$80
     STA Title_ObjFlags,X   ; Vertically flipped
@@ -4292,8 +4293,8 @@ KS_LuigiKick_MarioCatch:
     LDA Title_ObjMLHold+1
     BEQ PRG024_B5BB     ; If Luigi is NOT holding the shell, jump to PRG024_B5BB
 
-    LDA #-48
-    STA Title_ObjXVel+2,X  ; X Velocity = -48
+    LDA #<-48
+    STA Title_ObjXVel+2,X  ; X Velocity = <-48
     LDY #$01        ; Luigi carries the shell
     JMP KS_ShellCarry   ; Do KS_ShellCarry
 
@@ -4311,8 +4312,8 @@ PRG024_B5BB:
 
     LDA #$00
     STA Title_ObjXVel+2,X  ; Shell's X velocity = 0
-    LDA #-48
-    STA Title_ObjYVel  ; MARIO's Y velocity = -48
+    LDA #<-48
+    STA Title_ObjYVel  ; MARIO's Y velocity = <-48
 
 PRG024_B5D0:
     LDA Title_ObjMLHold
@@ -4340,10 +4341,10 @@ PRG024_B5E2:
     LDA Title_XPosHi+2,X
     BEQ PRG024_B5FD     ; If "high" part of X position is zero, jump to PRG024_B5FD
 
-    ; Otherwise, shell's X position (including "high") amount to -16 (wrap around the screen!)
+    ; Otherwise, shell's X position (including "high") amount to <-16 (wrap around the screen!)
     LDA #$ff
     STA Title_XPosHi+2,X
-    LDA #-16
+    LDA #<-16
     STA Title_ObjX+2,X
 
     LDA #48
@@ -4414,8 +4415,8 @@ PRG024_B642:
     JMP Title_ObjDraw    ; Draw objects and don't come back
 
 KS_Carry_Xoff:
-    .byte -12, -10, -6, -2, 2, 6, 10, 12    ; When carrier not horizontally flipped
-    .byte 12, 10, 6, 2, -2, -6, -10, -12    ; When carrier is horizontally flipped
+    .byte <-12, <-10, <-6, <-2, 2, 6, 10, 12    ; When carrier not horizontally flipped
+    .byte 12, 10, 6, 2, <-2, <-6, <-10, <-12    ; When carrier is horizontally flipped
 
 KS_ShellCarry:
     ; 'Y' specifies the "carrier" (0 = Mario, 1 = Luigi)
@@ -4497,7 +4498,7 @@ PRG024_B6A8:
 
     ; For both of these, the first value is used if the object is off to the right,
     ; otherwise the second value for when they are off to the left
-Title_ObjXLimit:    .byte -16, 48   ; Limits for how far off the side of the screen they can go
+Title_ObjXLimit:    .byte <-16, 48   ; Limits for how far off the side of the screen they can go
 Title_ObjXLimitHi:  .byte $FF, $00  ; Respective 16-bit sign extensions
 
 
@@ -4727,10 +4728,10 @@ PRG024_B7A4:
 Title_Menu_InitKoopa:
     INC Title_ObjStates,X   ; Increment this object's state
 
-    ; Set this object's XHi / X position to -16
+    ; Set this object's XHi / X position to <-16
     LDA #$ff
     STA Title_XPosHi+2,X
-    LDA #-16
+    LDA #<-16
     STA Title_ObjX+2,X
 
     LDA #8          ; Most of the menu koopas run at X Velocity 8
@@ -4746,7 +4747,7 @@ PRG024_B7BA:
 
     ; Y offsets per sprite of the koopa
 Title_Menu_Koopa_SprYOff:
-    .byte -32, -16, 0
+    .byte <-32, <-16, 0
 
     ; This defines an X coordinate per-menu koopa of when to signal the
     ; next koopa (unless zero, which means "never", used for the straggler)
@@ -5318,7 +5319,7 @@ PDiagBox_R3:    .byte $95, $91, $91, $91, $91, $91, $91, $91, $91, $91, $91, $91
 PDiagBox_RowOffs:
     .byte (PDiagBox_R1 - PDiagBox_R1), (PDiagBox_R2 - PDiagBox_R1), (PDiagBox_R2 - PDiagBox_R1), (PDiagBox_R2 - PDiagBox_R1)
     .byte (PDiagBox_R2 - PDiagBox_R1), (PDiagBox_R2 - PDiagBox_R1), (PDiagBox_R2 - PDiagBox_R1), (PDiagBox_R3 - PDiagBox_R1)
-PDiagBox_RowOffs_End
+PDiagBox_RowOffs_End:
 
 
 EndText_DrawDiagBox:
@@ -5541,7 +5542,7 @@ PRG024_BBA1:
     BLT PRG024_BBA1  ; If X < World_Map_Y, jump to PRG024_BBA1
 
 PRG024_BBAA:
-    CPX #-1
+    CPX #<-1
     BNE PRG024_BB9D  ; While X >= 0, loop!
 
     ; This clears some of the title screen area memory
@@ -5862,7 +5863,7 @@ Ending2_THEEND:
     .byte $60, $FB, $03, $88
     .byte $60, $FD, $03, $90
     .byte $60, $FF, $03, $98
-Ending2_THEEND_End
+Ending2_THEEND_End:
 
 Do_Ending2_IntCmd:
     DEC Ending2_IntCmd ; Ending2_IntCmd-- (because it is zero based, and zero is "Do nothing")
@@ -6274,7 +6275,7 @@ PRG024_BF13:
     ; Fade out command queues
 Ending2_FadeOutQs:
     .byte $25, $26, $27, $28, $28, $28, $28
-Ending2_FadeOutQs_End
+Ending2_FadeOutQs_End:
 
 Ending2_FadeOut:
     DEC Ending2_FadeTimer
@@ -6374,12 +6375,12 @@ Ending2_EndPicSpriteListL:
 Ending2_EndPicSpriteListLen:
     .byte (Ending2_EndPicSprites1_End - Ending2_EndPicSprites1 - 1)
     .byte (Ending2_EndPicSprites2_End - Ending2_EndPicSprites2 - 1)
-    .byte (Ending2_EndPicSprites3_End - Ending2_EndPicSprites3 - 1)
-    .byte (Ending2_EndPicSprites4_End - Ending2_EndPicSprites4 - 1)
-    .byte (Ending2_EndPicSprites5_End - Ending2_EndPicSprites5 - 1)
-    .byte (Ending2_EndPicSprites6_End - Ending2_EndPicSprites6 - 1)
-    .byte (Ending2_EndPicSprites7_End - Ending2_EndPicSprites7 - 1)
-    .byte (Ending2_EndPicSprites8_End - Ending2_EndPicSprites8 - 1)
+    .byte <(Ending2_EndPicSprites3_End - Ending2_EndPicSprites3 - 1)
+    .byte <(Ending2_EndPicSprites4_End - Ending2_EndPicSprites4 - 1)
+    .byte <(Ending2_EndPicSprites5_End - Ending2_EndPicSprites5 - 1)
+    .byte <(Ending2_EndPicSprites6_End - Ending2_EndPicSprites6 - 1)
+    .byte <(Ending2_EndPicSprites7_End - Ending2_EndPicSprites7 - 1)
+    .byte <(Ending2_EndPicSprites8_End - Ending2_EndPicSprites8 - 1)
 
 Ending2_EndPicSprites1:
     .byte $81, $19, $00, $B0
@@ -6392,7 +6393,7 @@ Ending2_EndPicSprites1:
     .byte $B1, $DB, $41, $88
     .byte $B1, $D9, $01, $90
     .byte $B1, $DB, $41, $98
-Ending2_EndPicSprites1_End
+Ending2_EndPicSprites1_End:
 
 Ending2_EndPicSprites2:
     .byte $79, $1B, $40, $38
@@ -6409,7 +6410,7 @@ Ending2_EndPicSprites2:
     .byte $99, $B3, $02, $D8
     .byte $A9, $B5, $02, $D0
     .byte $A9, $B7, $02, $D8
-Ending2_EndPicSprites2_End
+Ending2_EndPicSprites2_End:
 
 Ending2_EndPicSprites3:
     .byte $3F, $B1, $01, $30

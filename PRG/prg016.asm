@@ -11,6 +11,16 @@
 ; This source file last updated: 2012-01-04 18:17:40.023928498 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_16"
+
+.export LeveLoad_FixedSizeGen_TS3, LevelLoad_TS3, LoadLevel_Generator_TS3, Tile_Attributes_TS3, Tile_Layout_TS3
+.export Unused3L, W102L, W1HBA, W1HBB, W202L, W2PY_InsideL, W2STL, W403_UnderL
+.export W5HBA, W5HBB, W605_UnderL, W606_UnderL, W609_UnderL, W703L
+
 Tile_Layout_TS3:
     ; This defines the individual 8x8 blocks used to construct one of the tiles
     ; Referenced by Address_Per_Tileset, addressed by Level_Tileset

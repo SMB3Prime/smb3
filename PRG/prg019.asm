@@ -11,6 +11,18 @@
 ; This source file last updated: 2012-01-04 18:49:10.560742630 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_19"
+
+.export LeveLoad_FixedSizeGen_TS051113, LevelLoad_TS13, LevelLoad_TS5, LoadLevel_Generator_TS051113
+.export Tile_Attributes_TS5_TS11_TS13, Tile_Layout_TS5_TS11_TS13
+.export Unused3_CHL, W103_CoinHeavL, W105_CoinHeavL, W307_CoinHeavL, W401L, W402L, W403L, W404L
+.export W405L, W4HBA, W504L, W506L, W507L, W508L, W509L, W5HBC, W5HBD, W5T2L, W5T4L, W5TDL
+.export W604_CoinHeavL, W708_CoinHeavL, W7I1L, W7I2L, W8H1L, W8H2L, W8H3L
+
 Tile_Layout_TS5_TS11_TS13:
     ; This defines the individual 8x8 blocks used to construct one of the tiles
     ; Referenced by Address_Per_Tileset, addressed by Level_Tileset
@@ -501,7 +513,7 @@ PRG019_A5D9:
 LL_MuncherAlternators:
     .byte TILE5_MUNCHER_1, TILE5_MUNCHER_2
 
-LoadLevel_MuncherAlternators
+LoadLevel_MuncherAlternators:
     LDA LL_ShapeDef
     SEC
     SBC #$00
@@ -626,7 +638,7 @@ LL_LargeBGClouds:
 
 LL_LargeBGCloudChecks:
     .byte TILE13_BALLCLOUD_UL, TILE13_LARGEROUND_UL, TILE13_BALLCLOUD_UR, TILE13_LARGEROUND_UR, TILE13_BALLCLOUD_LL, TILE13_LARGEROUND_LL, TILE13_BALLCLOUD_LR, TILE13_LARGEROUND_LR
-LL_LBGCC_End
+LL_LBGCC_End:
 
 
 LoadLevel_PrefabBGClouds:

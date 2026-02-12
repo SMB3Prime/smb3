@@ -11,6 +11,16 @@
 ; This source file last updated: 2012-03-25 13:37:28.828970596 -0500
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_25"
+
+.export EndPicByWorld_H, EndPicByWorld_L, EndPic_VRAMStart_H, EndPic_VRAMStart_L, Ending2_EndPicSprites3_End
+.export Ending2_EndPicSprites4, Ending2_EndPicSprites4_End, Ending2_EndPicSprites5, Ending2_EndPicSprites5_End
+.export Ending2_EndPicSprites6, Ending2_EndPicSprites6_End, Ending2_EndPicSprites7, Ending2_EndPicSprites7_End
+.export Ending2_EndPicSprites8, Ending2_EndPicSprites8_End, Video_Upd_Table2
 
     ; Ending Sprite list continued from PRG024 ...
 
@@ -21,7 +31,7 @@
     .byte $6F, $01, $40, $E0
     .byte $7F, $03, $00, $D8
     .byte $7F, $03, $40, $E0
-Ending2_EndPicSprites3_End
+Ending2_EndPicSprites3_End:
 
 Ending2_EndPicSprites4:
     .byte $21, $81, $01, $70
@@ -36,7 +46,7 @@ Ending2_EndPicSprites4:
     .byte $3F, $49, $01, $28
     .byte $3F, $4B, $01, $30
     .byte $3F, $4D, $01, $38
-Ending2_EndPicSprites4_End
+Ending2_EndPicSprites4_End:
 
 Ending2_EndPicSprites5:
     .byte $69, $29, $00, $B0
@@ -52,7 +62,7 @@ Ending2_EndPicSprites5:
     .byte $99, $63, $01, $D8
     .byte $A9, $65, $01, $D0
     .byte $A9, $67, $01, $D8
-Ending2_EndPicSprites5_End
+Ending2_EndPicSprites5_End:
 
 Ending2_EndPicSprites6:
     .byte $69, $19, $40, $20
@@ -66,7 +76,7 @@ Ending2_EndPicSprites6:
     .byte $A9, $D5, $02, $78
     .byte $A9, $5B, $01, $A0
     .byte $A9, $5D, $01, $A8
-Ending2_EndPicSprites6_End
+Ending2_EndPicSprites6_End:
 
 Ending2_EndPicSprites7:
     .byte $41, $F1, $02, $D8
@@ -78,7 +88,7 @@ Ending2_EndPicSprites7:
     .byte $79, $65, $42, $A8
     .byte $89, $37, $40, $A8
     .byte $89, $35, $40, $B0
-Ending2_EndPicSprites7_End
+Ending2_EndPicSprites7_End:
 
 Ending2_EndPicSprites8:
     .byte $79, $03, $40, $28
@@ -99,7 +109,7 @@ Ending2_EndPicSprites8:
     .byte $B0, $7B, $01, $B8
     .byte $B0, $7D, $01, $C0
     .byte $B0, $7F, $01, $C8
-Ending2_EndPicSprites8_End
+Ending2_EndPicSprites8_End:
 
 
     ; Split address, parallel tables for the starting address of the end picture for each world

@@ -11,6 +11,15 @@
 ; This source file last updated: 2012-04-02 22:20:56.965729406 -0500
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_02"
+
+.export Bank2_HotFootHaltAction, Bank2_PiranhaSpikeHaltAction, Bank2_SpikeHaltAction, Buster_DrawHoldingIceBrick
+.export EndLevelCard_Draw, Shoe_DrawGoomba
+
     ; CAUTION!! ObjectGroup01 labels MUST appear at the
     ; address specified by the predefined constants!  I can't
     ; verify this at the assembler level, so be careful!!
@@ -22,7 +31,7 @@
 
     ; Object group $01 (i.e. objects starting at ID $24) State 1 jump table
 
-    .base ObjectGroup_InitJumpTable  ; <-- help enforce this table *here*
+.assert * = ObjectGroup_InitJumpTable, error, "ObjectGroup_InitJumpTable must be at $A000"
 ObjectGroup01_InitJumpTable:
     .word ObjInit_CloudPlatFast ; Object $24 - OBJ_CLOUDPLATFORM_FAST
     .word ObjInit_PipewayCtlr   ; Object $25 - OBJ_PIPEWAYCONTROLLER
@@ -64,7 +73,7 @@ ObjectGroup01_InitJumpTable:
 
     ; Object group $01 (i.e. objects starting at ID $24) State 2 jump table
 
-    .base ObjectGroup_NormalJumpTable    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_NormalJumpTable, error, "ObjectGroup_NormalJumpTable must be at $A048"
 ObjectGroup01_NormalJumpTable:
     .word ObjNorm_CloudPlat     ; Object $24 - OBJ_CLOUDPLATFORM_FAST
     .word ObjNorm_PipewayCtlr   ; Object $25 - OBJ_PIPEWAYCONTROLLER
@@ -107,7 +116,7 @@ ObjectGroup01_NormalJumpTable:
     ; Object group $01 (i.e. objects starting at ID $24) Collision routine jump table (if calling Object_HitTestRespond;
     ; Special values of OCSPECIAL_KILLCHANGETO or OCSPECIAL_HIGHSCORE can be used here instead otherwise.)
 
-    .base ObjectGroup_CollideJumpTable   ; <-- help enforce this table *here*
+.assert * = ObjectGroup_CollideJumpTable, error, "ObjectGroup_CollideJumpTable must be at $A090"
 ObjectGroup01_CollideJumpTable:
     .word ObjHit_CloudPlat      ; Object $24 - OBJ_CLOUDPLATFORM_FAST
     .word ObjHit_DoNothing      ; Object $25 - OBJ_PIPEWAYCONTROLLER
@@ -149,7 +158,7 @@ ObjectGroup01_CollideJumpTable:
 
     ; Object group $01 (i.e. objects starting at ID $24) attribute bits set 1 (OA1_* flags valid here)
 
-    .base ObjectGroup_Attributes ; <-- help enforce this table *here*
+.assert * = ObjectGroup_Attributes, error, "ObjectGroup_Attributes must be at $A0D8"
 ObjectGroup01_Attributes:
     .byte OA1_PAL1 | OA1_HEIGHT16 | OA1_WIDTH48 ; Object $24 - OBJ_CLOUDPLATFORM_FAST
     .byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH8  ; Object $25
@@ -197,7 +206,7 @@ ObjectGroup01_Attributes:
     ;   Bits 3: Object uses 16-bit X value (otherwise, Object_XHi will be zeroed)
     ;   Bits 4-7: Pick root tile detection group offset (from Object_TileDetectOffsets)
 
-    .base ObjectGroup_Attributes2    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_Attributes2, error, "ObjectGroup_Attributes2 must be at $A0FC"
 ObjectGroup01_Attributes2:
     .byte OA2_TDOGRP2   ; Object $24 - OBJ_CLOUDPLATFORM_FAST
     .byte OA2_TDOGRP0   ; Object $25
@@ -239,7 +248,7 @@ ObjectGroup01_Attributes2:
 
     ; Object group $01 (i.e. objects starting at ID $24) third set attribute bits
 
-    .base ObjectGroup_Attributes3    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_Attributes3, error, "ObjectGroup_Attributes3 must be at $A120"
 ObjectGroup01_Attributes3:
     .byte OA3_HALT_NORMALONLY | OA3_TAILATKIMMUNE   ; Object $24 - OBJ_CLOUDPLATFORM_FAST
     .byte OA3_HALT_NORMALONLY | OA3_NOTSTOMPABLE | OA3_TAILATKIMMUNE    ; Object $25
@@ -281,7 +290,7 @@ ObjectGroup01_Attributes3:
 
     ; Object group $01 (i.e. objects starting at ID $24) Pattern Table Select
 
-    .base ObjectGroup_PatTableSel    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_PatTableSel, error, "ObjectGroup_PatTableSel must be at $A144"
 ObjectGroup01_PatTableSel:
     .byte OPTS_SETPT5 | $0E ; Object $24 - OBJ_CLOUDPLATFORM_FAST
     .byte OPTS_NOCHANGE ; Object $25
@@ -323,7 +332,7 @@ ObjectGroup01_PatTableSel:
 
     ; Object group $01 (i.e. objects starting at ID $24) "Kill Action"
 
-    .base ObjectGroup_KillAction ; <-- help enforce this table *here*
+.assert * = ObjectGroup_KillAction, error, "ObjectGroup_KillAction must be at $A168"
 ObjectGroup01_KillAction:
     .byte KILLACT_STANDARD  ; Object $24 - OBJ_CLOUDPLATFORM_FAST
     .byte KILLACT_STANDARD  ; Object $25
@@ -367,7 +376,7 @@ ObjectGroup01_KillAction:
     ; These are used for all states except "normal"
 
 
-    .base ObjectGroup_PatternStarts  ; <-- help enforce this table *here*
+.assert * = ObjectGroup_PatternStarts, error, "ObjectGroup_PatternStarts must be at $A18C"
 ObjectGroup01_PatternStarts:
     ; Index by object group relative index (ObjGroupRel_Idx)
     .byte ObjP24 - ObjectGroup01_PatternSets, ObjP25 - ObjectGroup01_PatternSets, ObjP26 - ObjectGroup01_PatternSets, ObjP27 - ObjectGroup01_PatternSets
@@ -392,7 +401,7 @@ ObjectGroup01_PatternStarts:
     ; valid JMP $xxxx instruction to go to an alternate giant shell
     ; drawing routine (since otherwise default code is used)
 
-    .base ObjectGroup_PatternSets    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_PatternSets, error, "ObjectGroup_PatternSets must be at $A1B0"
 ObjectGroup01_PatternSets:
     ; (End restricted alignment space)
 
@@ -604,8 +613,8 @@ PRG002_A30C:
 
 GiantBlockCtl_DebrisXOff:   .byte $00, $10, $00, $10
 GiantBlockCtl_DebrisYOff:   .byte $00, $00, $10, $10
-GiantBlockCtl_DebrisXVel:   .byte -$10, $10, -$10, $10
-GiantBlockCtl_DebrisYVel:   .byte -$40, -$40, -$28, -$28
+GiantBlockCtl_DebrisXVel:   .byte <-$10, $10, <-$10, $10
+GiantBlockCtl_DebrisYVel:   .byte <-$40, <-$40, <-$28, <-$28
 
 PRG002_A325:
     ; Set like Player bounced up
@@ -758,7 +767,7 @@ PRG002_A3DA:
     ; we jump to PRG002_A417, which decrements 'Y' then 'X'. It is possible
     ; that there are no free "special object" slots, but we haven't decremented
     ; 'X' all the way, which means that we continue to loop! So you could have
-    ; Y = -1, Y = -2, ... and, bingo, memory corruption!
+    ; Y = <-1, Y = <-2, ... and, bingo, memory corruption!
 
     ; Incidentally, this never happens in SMB3 because the Giant World levels
     ; were designed such that there was no way that all special object slots
@@ -932,7 +941,7 @@ CarryClearIfAliveAndNoHalt:
 PRG002_A4C5:
     RTS      ; Return
 
-Buster_XVel:    .byte -$10, $10
+Buster_XVel:    .byte <-$10, $10
 
 ObjInit_BusterBeatle:
     LDY Scroll_LastDir ; Get last scroll direction
@@ -1047,7 +1056,7 @@ PRG002_A542:
     ASL A
     BMI PRG002_A55C  ; If horizontally flipped, jump to PRG002_A55C
 
-    LDY #-$10    ; Y = -$10 (Run left)
+    LDY #<-$10    ; Y = <-$10 (Run left)
 
 PRG002_A55C:
     STY Objects_XVel,X  ; Set Buster's X Velocity
@@ -1171,12 +1180,12 @@ PRG002_A5AE:
     LDY #$30     ; Y = $30
     ASL A
     BMI PRG002_A5F2  ; If Buster's turned around, jump to PRG002_A5F2
-    LDY #-$30    ; Otherwise, Y = -$30
+    LDY #<-$30    ; Otherwise, Y = <-$30
 PRG002_A5F2:
     STY Objects_XVel,X
 
     ; Set Y velocity
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel,X
 
 PRG002_A5F8:
@@ -1188,8 +1197,8 @@ Buster_BlockLiftXOff:
     .byte $01, $03, $05, $07, $08, $09, $0A, $0A
 
 Buster_BlockLiftYOff:
-    .byte -$0E, -$0E, -$0E, -$0E, -$0E, -$0E, -$0E, -$0E, -$0E, -$0E, -$0E, -$0D
-    .byte -$0C, -$0D, -$0E, -$0E, -$0F, -$0E, -$0D, -$0B, -$09, -$06, -$03, $00
+    .byte <-$0E, <-$0E, <-$0E, <-$0E, <-$0E, <-$0E, <-$0E, <-$0E, <-$0E, <-$0E, <-$0E, <-$0D
+    .byte <-$0C, <-$0D, <-$0E, <-$0E, <-$0F, <-$0E, <-$0D, <-$0B, <-$09, <-$06, <-$03, $00
 
 Buster_DrawHoldingIceBrick:
     JSR Object_ShakeAndCalcSprite
@@ -1523,10 +1532,10 @@ ObjInit_CheepCheepP2P:
 
     RTS      ; Return
 
-CheepP2P_XVel:  .byte -$10, -$10, $10, $10, -$10, $10
-CheepP2P_YVel:  .byte -$36, -$36, -$47, -$47, -$3F, -$3F
+CheepP2P_XVel:  .byte <-$10, <-$10, $10, $10, <-$10, $10
+CheepP2P_YVel:  .byte <-$36, <-$36, <-$47, <-$47, <-$3F, <-$3F
 
-PRG002_A772:    .byte $20, $20, -$20, -$20, $00, $00
+PRG002_A772:    .byte $20, $20, <-$20, <-$20, $00, $00
 
 ObjNorm_CheepCheepP2P:
     LDA Objects_Timer,X
@@ -1706,7 +1715,7 @@ PRG002_A832:
 
     BCS PRG002_A844 ; If horizontally flipped, jump to PRG002_A844
 
-    LDA #-$08   ; Walk left
+    LDA #<-$08   ; Walk left
 
 PRG002_A844:
     STA Objects_XVel,X  ; Set X velocity appropriately
@@ -1820,8 +1829,8 @@ PRG002_A8C5:
 PRG002_A8CC:
     RTS      ; Return
 
-Boo_VelAccel:   .byte $01, -$01
-Boo_VelLimit:   .byte $10, -$10
+Boo_VelAccel:   .byte $01, <-$01
+Boo_VelLimit:   .byte $10, <-$10
 
 ObjNorm_Boo:
     JSR Boo_CheckPlayerSight
@@ -1886,7 +1895,7 @@ Object_DeleteOrDraw:
     JSR Object_DeleteOffScreen  ; Delete object if it falls off-screen
     JMP Object_ShakeAndDraw     ; Draw and don't come back!
 
-Stretch_XVelStart:  .byte -$10, $10
+Stretch_XVelStart:  .byte <-$10, $10
 FacePlayer_FlipBitsStart:   .byte $00, SPR_HFLIP, $00   ; Boo uses an off-by-1 index here, hence the other $00
 
 ObjInit_Stretch:
@@ -1916,8 +1925,8 @@ PRG002_A935:
 ObjInit_StretchFlip:
     JSR PRG002_A935  ; Do most of what the un-flipped Stretch does
 
-    ; Flipped Stretch's Y velocity = -$80 (Ram into nearest ceiling)
-    LDA #-$80
+    ; Flipped Stretch's Y velocity = <-$80 (Ram into nearest ceiling)
+    LDA #<-$80
     STA Objects_YVel,X
 
     ; Set vertical flip
@@ -2052,13 +2061,13 @@ PRG002_A9D2:
     LDA Player_HaltGame
     BNE PRG002_A9C1  ; If gameplay is halted, jump to PRG002_A9C1 (RTS)
 
-    ; Lift accelerates to -$20
+    ; Lift accelerates to <-$20
     LDA Objects_YVel,X
     SEC
     SBC #$04
-    CMP #-$20
+    CMP #<-$20
     BGE PRG002_A9E4
-    LDA #-$20
+    LDA #<-$20
 PRG002_A9E4:
 
     LDY Objects_YHi,X
@@ -2145,8 +2154,8 @@ PRG002_AA21:
 
 ObjInit_CloudPlatFast:
 
-    ; Set X velocity to -$0A
-    LDA #-$0A
+    ; Set X velocity to <-$0A
+    LDA #<-$0A
 
 PRG002_AA37:
     STA Objects_XVel,X
@@ -2165,11 +2174,11 @@ PRG002_AA41:
 
 
 ObjInit_CloudPlatform:
-    LDA #-$06    ; X velocity = -$06
+    LDA #<-$06    ; X velocity = <-$06
     BNE PRG002_AA37  ; Jump (technically always) to PRG002_AA37
 
 ObjInit_WoodenPlatform:
-    LDA #-$08    ; X velocity = -$08
+    LDA #<-$08    ; X velocity = <-$08
     BNE PRG002_AA37  ; Jump (technically always) to PRG002_AA37
 
 ObjInit_OscillatingShort:
@@ -2212,7 +2221,7 @@ Player_StandOnPlatform:
     LDA Object_VelCarry
     BPL PRG002_AA7B
 
-    DEY      ; Y = -1 (provides a sort of carry if Player's X Velocity caused one)
+    DEY      ; Y = <-1 (provides a sort of carry if Player's X Velocity caused one)
 
 PRG002_AA7B:
     ; Add to Player_X, with carry
@@ -2290,8 +2299,8 @@ Object_HitFloorAlign:
     JMP Object_HitGround     ; Otherwise, align to ground and don't come back!
 
     ; Oscillating platform velocity and limits by direction
-OscXVelLimit:   .byte -$10, $10
-OscXVel:    .byte -$01, $01
+OscXVelLimit:   .byte <-$10, $10
+OscXVel:    .byte <-$01, $01
 
 ObjNorm_OscillatingH:
     LDA Player_HaltGame
@@ -2380,7 +2389,7 @@ PRG002_AB35:
     RTS      ; Return
 
 Float_YVelAdj:  .byte $02, $06, $0A
-Float_YAccel:   .byte $02, -$01, -$04
+Float_YAccel:   .byte $02, <-$01, <-$04
 
 ObjNorm_WoodenPlatFloat:
     JSR Fish_FixedYIfAppro      ; Fixes 'Y' coordinate for platform that floats in fixed water
@@ -2403,7 +2412,7 @@ ObjNorm_WoodenPlatFloat:
 
     INY      ; Y = 1
 
-    CMP #-$02
+    CMP #<-$02
     BGE PRG002_AB5E
 
     LDA Objects_YVel,X
@@ -2500,7 +2509,7 @@ PRG002_ABB9:
 
     ; Index offsets looking for next path element
 WoodenPlat_ScanIndices:
-    .byte -$06, $06, -$05, $05, -$04, $04, -$03, $03, -$02, $02, -$01, $01, $00
+    .byte <-$06, $06, <-$05, $05, <-$04, $04, <-$03, $03, <-$02, $02, <-$01, $01, $00
 WoodenPlat_ScanIndices_End:
 
 
@@ -2529,18 +2538,18 @@ WoodenPlat_PathTilesAlt:
 
     ; Y velocities appropriate to path tile hit
 WoodenPlat_YVel:
-    .byte -$10, -$10, -$10, -$10    ; forward
+    .byte <-$10, <-$10, <-$10, <-$10    ; forward
     .byte  $00,  $10,  $10,  $10
     .byte  $10,  $10,  $10,  $10    ; reverse
-    .byte  $00, -$10, -$10, -$10
+    .byte  $00, <-$10, <-$10, <-$10
     .byte  $00  ; Stop
 
     ; X velocities appropriate to path tile hit
 WoodenPlat_XVel:
     .byte  $00,  $08,  $08,  $10    ; forward
     .byte  $10,  $10,  $08,  $08
-    .byte  $00, -$08, -$08, -$10    ; reverse
-    .byte -$10, -$10, -$08, -$08
+    .byte  $00, <-$08, <-$08, <-$10    ; reverse
+    .byte <-$10, <-$10, <-$08, <-$08
     .byte  $00  ; Stop
 
 
@@ -2701,7 +2710,7 @@ PRG002_ACBC:
     RTS      ; Return
 
 EnemyEnterFlip: .byte  $00, SPR_HFLIP
-EnemyEnterXVel: .byte -$08, $08
+EnemyEnterXVel: .byte <-$08, $08
 
 ObjInit_TowardsPlayer:
 
@@ -2942,7 +2951,7 @@ Object_SetXVelByFacingDir:
 
     LDA #$08
     BCS PRG002_AE28
-    LDA #-$08
+    LDA #<-$08
 PRG002_AE28:
     STA Objects_XVel,X
 
@@ -3036,12 +3045,12 @@ PRG002_AE51:
     JMP PRG002_AF30  ; Jump to PRG002_AF30
 
 Patooie_BallYDelta:
-    .byte $00, -$01, -$02, -$03, -$03, -$03, -$02, -$01, $00,  $01, $02, $03, $03, $03, $02, $01
-    .byte $00, -$01, -$01, -$01,  $00,  $01,  $01,  $01
+    .byte $00, <-$01, <-$02, <-$03, <-$03, <-$03, <-$02, <-$01, $00,  $01, $02, $03, $03, $03, $02, $01
+    .byte $00, <-$01, <-$01, <-$01,  $00,  $01,  $01,  $01
 
     ; Jiggles the spike ball a bit
 Patooie_BallXJiggle:
-    .byte $00, -$01, $00, $01
+    .byte $00, <-$01, $00, $01
 
 
 ObjNorm_Patooie:
@@ -3390,7 +3399,7 @@ ObjNorm_GoombaInShoe:
 
 PRG002_B066:
     ; Bounce
-    LDA #-$38
+    LDA #<-$38
     STA Objects_YVel,X
 
 PRG002_B06A:
@@ -3422,13 +3431,13 @@ PRG002_B076:
     ASL A
     BMI PRG002_B090  ; If horizontally flipped, jump to PRG002_B090
 
-    LDY #-$10    ; Y = -$10 (hop to left)
+    LDY #<-$10    ; Y = <-$10 (hop to left)
 
 PRG002_B090:
     STY Objects_XVel,X  ; Set proper X velocity
 
     ; Hop!
-    LDA #-$50
+    LDA #<-$50
     STA Objects_YVel,X
     BNE PRG002_B0A1  ; Jump (technically always) to PRG002_B0A1
 
@@ -3517,7 +3526,7 @@ PRG002_B0C1:
     STA Objects_FlipBits,X
 
     ; Goomba bump Y velocity
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel,X
 
 PRG002_B0FB:
@@ -3568,7 +3577,7 @@ PRG002_B126:
 
     ; The Y offset for the Goomba riding in the shoe
 Shoe_GoombaYOff:
-    .byte $00, -$02, -$04, -$06, -$08, -$08, -$08, -$08, -$08, -$06, -$04, -$02, $F4, -$08, -$04
+    .byte $00, <-$02, <-$04, <-$06, <-$08, <-$08, <-$08, <-$08, <-$08, <-$06, <-$04, <-$02, $F4, <-$08, <-$04
 
 Shoe_DrawGoomba:
     JSR Object_ShakeAndCalcSprite
@@ -3689,7 +3698,7 @@ ObjNorm_Nipper:
     STA Objects_XVel,X
 
     ; Jump little Nipper!
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel,X
 
 PRG002_B1CD:
@@ -3749,7 +3758,7 @@ PRG002_B208:
     JSR Object_SetXVelByFacingDir   ; Face travel direction
 
     ; Hop hop hop
-    LDA #-$10
+    LDA #<-$10
     STA Objects_YVel,X
 
 PRG002_B20F:
@@ -3853,7 +3862,7 @@ TDiagBox_R3:    .byte $95, $91, $91, $91, $91, $91, $91, $91, $91, $91, $91, $91
 TDiagBox_RowOffs:
     .byte (TDiagBox_R1 - TDiagBox_R1), (TDiagBox_R2 - TDiagBox_R1), (TDiagBox_R2 - TDiagBox_R1), (TDiagBox_R2 - TDiagBox_R1)
     .byte (TDiagBox_R2 - TDiagBox_R1), (TDiagBox_R2 - TDiagBox_R1), (TDiagBox_R2 - TDiagBox_R1), (TDiagBox_R3 - TDiagBox_R1)
-TDiagBox_RowOffs_End
+TDiagBox_RowOffs_End:
 
 Toad_DrawDiagBox:
     LDX Graphics_BufCnt  ; X = current graphics buffer counter
@@ -4375,7 +4384,7 @@ ObjNorm_NipperFireBreathe:
     AND #$07
     BNE PRG002_B65A  ; Only do anything 1:8 ticks, otherwise jump to PRG002_B65A (RTS)
 
-    ; Set 'Y' to $10 or -$10 based on which side Player is on
+    ; Set 'Y' to $10 or <-$10 based on which side Player is on
     LDA Temp_Var15
     TAY
     CLC
@@ -4388,10 +4397,10 @@ ObjNorm_NipperFireBreathe:
     LDA Temp_Var15
     BPL PRG002_B61F
 
-    LDY #-$10    ; Y = -$10
+    LDY #<-$10    ; Y = <-$10
 
 PRG002_B61F:
-    STY Temp_Var1       ; Temp_Var1 = $10 or -$10, based on which side Player is on
+    STY Temp_Var1       ; Temp_Var1 = $10 or <-$10, based on which side Player is on
 
     JSR Object_CalcCoarseYDiff
 
@@ -4426,7 +4435,7 @@ PRG002_B61F:
     STA SpecialObj_XVel,Y
 
     ; Nipper fireball Y velocity
-    LDA #-$40
+    LDA #<-$40
     SEC
     SBC Temp_Var15
     STA SpecialObj_YVel,Y
@@ -4508,7 +4517,7 @@ PRG002_B6C2:
 
     ; Reassembling Dry Bones
 
-    LDY Objects_Var5,X ; Y = Var5 (0 = fully reassembled, hence -1 used below)
+    LDY Objects_Var5,X ; Y = Var5 (0 = fully reassembled, hence <-1 used below)
 
     LDA DryBones_ReassembleFrames-1,Y
     STA Objects_Frame,X
@@ -4522,7 +4531,7 @@ PRG002_B6D0:
     ; Patterns used when Dry Bones is crumbling
 DryBones_CrumblePats:   .byte (ObjP3F - ObjectGroup01_PatternSets + $08), (ObjP3F - ObjectGroup01_PatternSets + $0B)
     ; Little head bounce when crumbled
-DryBones_HeadYOff:  .byte 0, 0, 0, -1, -2, -1, 0, 0, 0
+DryBones_HeadYOff:  .byte 0, 0, 0, <-1, <-2, <-1, 0, 0, 0
 
 DryBones_Draw:
     LDA Objects_Frame,X
@@ -4645,7 +4654,7 @@ ObjHit_DryBones:
     STA Objects_XVel,X
 
     ; Bounce Player
-    LDA #-$40
+    LDA #<-$40
     STA Player_YVel
 
     ; Crumble sound
@@ -4765,7 +4774,7 @@ PRG002_B7FB:
     CMP #OBJ_DRYBONES
     BNE PRG002_B80E  ; If Dry Bones bumped into something that's not a Dry Bones, jump to PRG002_B80E
 
-    ABS_LDA_X Objects_Var5,X ; LDA Objects_Var5,X
+    ABS_LDA_X Objects_Var5 ; LDA Objects_Var5,X
     BNE PRG002_B815  ; If Dry Bones bumped into a crumpled Dry Bones, jump to PRG002_B815
 
 PRG002_B80E:
@@ -4781,7 +4790,7 @@ PRG002_B815:
     LDX SlotIndexBackup         ; X = object slot index
     RTS      ; Return
 
-Respawn_XLo:    .byte $40, -$40
+Respawn_XLo:    .byte $40, <-$40
 Respawn_XHi:    .byte $00, $FF
 
 Fish_Repawn:
@@ -4811,18 +4820,18 @@ ObjInit_ChasingFish:
     STA Objects_YHi,X
 
     ; Come in hopping!
-    LDA #-$08
+    LDA #<-$08
     STA Objects_YVel,X
 
-    ; Frame -1??
-    LDA #-1
+    ; Frame <-1??
+    LDA #<-1
     STA Objects_Frame,X
 
     RTS      ; Return
 
-BigBertha_ProxLimit:    .byte $08, -$09 ; How close (in coarse units) Big Bertha must be to Player to lunge
+BigBertha_ProxLimit:    .byte $08, <-$09 ; How close (in coarse units) Big Bertha must be to Player to lunge
 BigBertha_XVelLimit:    .byte $30, $50  ; Limit on X Velocity (relative, used in addition)
-BigBertha_Accel:    .byte -$04, $04 ; X Velocity acceleration for each direction
+BigBertha_Accel:    .byte <-$04, $04 ; X Velocity acceleration for each direction
 BigBertha_XCoarseLimit: .byte $10, $70  ; How far away Big Bertha can be before turning around
 BigBertha_EatLimit: .byte $01, $03  ; In coarse units (relative, used in addition), when Player is close enough to be eaten
 
@@ -4954,7 +4963,7 @@ PRG002_B8E4:
     ROR Objects_XVel,X ; Carry shifted back into Bit 7
 
     ; Big Bertha jumps!
-    LDA #-$28
+    LDA #<-$28
     STA Objects_YVel,X
 
     ; Gaping mouth
@@ -5071,11 +5080,11 @@ PRG002_B981:
     STA Player_SpriteY
 
 PRG002_B98D:
-    ; Big Bertha Y Vel = -$08
-    LDA #-$08
+    ; Big Bertha Y Vel = <-$08
+    LDA #<-$08
     STA Objects_YVel,X
 
-    ; Sprite frame = -1 (??)
+    ; Sprite frame = <-1 (??)
     LDA #$ff
 
 PRG002_B993:
@@ -5178,9 +5187,9 @@ PRG002_B9FB:
     LDX SlotIndexBackup         ; X = object slot index
     RTS      ; Return
 
-CheepCheepCharge_ProxLimit: .byte $06, -$06 ; How close (in coarse units) Cheep Cheep must be to Player to lunge
+CheepCheepCharge_ProxLimit: .byte $06, <-$06 ; How close (in coarse units) Cheep Cheep must be to Player to lunge
 CheepCheepCharge_XVelLimit: .byte $20, $60  ; Limit on X Velocity (relative, used in addition)
-CheepCheepCharge_Accel:     .byte -$01, $01 ; X Velocity acceleration for each direction
+CheepCheepCharge_Accel:     .byte <-$01, $01 ; X Velocity acceleration for each direction
 CheepCheepCharge_XCoarseLimit:  .byte $10, $70  ; How far away Cheep Cheep can be before turning around
 
 
@@ -5275,7 +5284,7 @@ PRG002_BA78:
     BGE PRG002_BAA6  ; If Cheep Cheep is vertically too far from Player, jump to PRG002_BAA6 (RTS)
 
     ; Big Bertha jumps!
-    LDA #-$28
+    LDA #<-$28
     STA Objects_YVel,X
 
     ; Does ... nothing to X Velocity?
@@ -5296,7 +5305,7 @@ PRG002_BA96:
     BLT PRG002_BAA6  ; If Cheep Cheep Y < 168, jump to PRG002_BAA6 (RTS)
 
     ; Stop Cheep Cheep from falling too far; bounce back up
-    LDA #-$08
+    LDA #<-$08
     STA Objects_YVel,X
 
     DEC Objects_Var4,X  ; Var4 = 0 (Cheep Cheep done lunging)
@@ -5333,7 +5342,7 @@ PRG002_BABE:
 
     ; Check if Player is hitting off bottom of platform
 
-    LDA #-$08   ; A = -8 unless small or ducking
+    LDA #<-$08   ; A = <-8 unless small or ducking
 
     LDY Player_Suit
     BEQ PRG002_BAC9  ; If Player is small, jump to PRG002_BAC9
@@ -5415,7 +5424,7 @@ PRG002_BAF4:
 
     RTS      ; Return
 
-PlayerPushWithPlatform_XVel:    .byte $04, -$04
+PlayerPushWithPlatform_XVel:    .byte $04, <-$04
 
     ; Attribute by frame
 EndLevelCard_AttributeByFrame:
@@ -5447,7 +5456,7 @@ EndLevelCard_CardBackLower:
     DBYT $2917
     .byte $02, $FE, $FE
     .byte $00
-EndLevelCard_CardEnd
+EndLevelCard_CardEnd:
 
 ObjNorm_EndLevelCard:
     LDA Objects_DetStat,X   ; Mis-used as tracking for the current internal state
@@ -5824,8 +5833,8 @@ EndLevelCard_SetupXUP:
     LDA #$ff
     STA Objects_Y,X
 
-    ; Y velocity = -$40
-    LDA #-$40
+    ; Y velocity = <-$40
+    LDA #<-$40
     STA Objects_YVel,X
 
     JMP Object_ResetXToSlotIndex     ; Set 'X' back to slot index and don't come back!
@@ -6289,7 +6298,7 @@ PRG002_BEFC:
     STA SpecialObj_YHi,X
 
     ; Pop out coin Y Velocity
-    LDA #-$28
+    LDA #<-$28
     STA SpecialObj_YVel,X
 
     ; Don't move horizontally
@@ -6321,11 +6330,11 @@ PRG002_BF4B:
     STA EndCard_Flag     ; Flag end level card as grabbed
 
     ; Card actually has a slight leftward velocity?
-    LDA #-$01
+    LDA #<-$01
     STA Objects_XVel,X
 
     ; Card moves upward
-    LDA #-$28
+    LDA #<-$28
     STA Objects_YVel,X
 
     LDY Objects_Frame,X  ; Y = current frame

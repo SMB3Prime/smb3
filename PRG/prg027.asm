@@ -11,6 +11,14 @@
 ; This source file last updated: 2012-03-12 22:48:10.385348943 -0500
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_27"
+
+.export CineKing_DoWandReturn, EndWorldLetter_GenerateText, Setup_PalData
+
 CineKing_DoWandReturn:
     LDA CineKing_Timer2
     BEQ PRG027_A008  ; If CineKing_Timer2 = 0, jump to PRG027_A008
@@ -184,7 +192,7 @@ Letter_PrincessSprites:
     .byte $88, $AF, $01, $40
     .byte $88, $FF, $01, $C0
     .byte $88, $FF, $41, $C8
-Letter_PrincessSprites_End
+Letter_PrincessSprites_End:
 
 TAndK_WaitForA:
     ; Load needed graphics
@@ -332,7 +340,7 @@ Letter_GiveIncludedItem:
     LDY #Inventory_Items2 - Inventory_Items   ; Offset to Luigi's items
 
 PRG027_A1EA:
-    LDX #Inventory_Cards - Inventory_Items - 1    ; X = total number of inventory items, -1
+    LDX #Inventory_Cards - Inventory_Items - 1    ; X = total number of inventory items, <-1
 
 PRG027_A1EC:
     LDA Inventory_Items,Y
@@ -360,7 +368,7 @@ DiagBox2_R3:    .byte $95, $91, $91, $91, $91, $91, $91, $91, $91, $91, $91, $91
 DiagBox2_RowOffs:
     .byte (DiagBox2_R1 - DiagBox2_R1), (DiagBox2_R2 - DiagBox2_R1), (DiagBox2_R2 - DiagBox2_R1), (DiagBox2_R2 - DiagBox2_R1)
     .byte (DiagBox2_R2 - DiagBox2_R1), (DiagBox2_R2 - DiagBox2_R1), (DiagBox2_R2 - DiagBox2_R1), (DiagBox2_R3 - DiagBox2_R1)
-DiagBox2_RowOffs_End
+DiagBox2_RowOffs_End:
 
 TAndK_DrawDiagBox2:
     LDA CineKing_Timer2
@@ -413,7 +421,7 @@ PRG027_A272:
     INC ToadTalk_CPos    ; Next row
 
     LDA ToadTalk_CPos
-    CMP #DiagBox_RowOffs_End - DiagBox_RowOffs
+    CMP #<(DiagBox_RowOffs_End - DiagBox_RowOffs)
     BLT PRG027_A2B3  ; If row count < 8, jump to PRG027_A2B3
 
     ; Dialog box is complete
@@ -712,7 +720,7 @@ Wand_SpinAttrs:
 Wand_FrameChangeMask:   .byte $03, $00
 
     ; Wand frame change delta
-Wand_FrameAdd:  .byte -$01, $01
+Wand_FrameAdd:  .byte <-$01, $01
 
     ; Base sprites for King and Toad
 KingAndToad_Sprites:
@@ -727,7 +735,7 @@ KingAndToad_Sprites:
     .byte $80, $00, $01, $A8
     .byte $70, $00, $01, $B0
     .byte $70, $00, $01, $A8
-KingAndToad_Sprites_End
+KingAndToad_Sprites_End:
 
     ; Patterns for the cheering Toad sprites
 Toad_FramePatterns:
@@ -880,7 +888,7 @@ PRG027_A66C:
     ; Bounce wand towards King
     LDA #$10
     STA CineKing_WandXVel
-    LDA #-$50
+    LDA #<-$50
     STA CineKing_WandYVel
 
     BNE PRG027_A69A  ; Jump (technically always) to PRG027_A69A
@@ -1352,7 +1360,7 @@ Letter_VRAMHi:
     ; Signature bottom row, Signature top row, Closing, Greeting
 Letter_VRAMLo:
     .byte $A8, $8B, $6B, $06
-Letter_VRAMLo_End
+Letter_VRAMLo_End:
 
 EndWorldLetter_GenerateText:
     LDX World_Num   ; X = current world index

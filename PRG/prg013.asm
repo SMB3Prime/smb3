@@ -11,6 +11,17 @@
 ; This source file last updated: 2012-01-04 18:58:32.468868255 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_13"
+
+.export LeveLoad_FixedSizeGen_TS14, LevelLoad_TS14, LoadLevel_Generator_TS14, Tile_Attributes_TS14, Tile_Layout_TS14
+.export BigQBlock1L, BigQBlock2L, BigQBlock3L, BigQBlock4L, BigQBlock5L, BigQBlock6L, BigQBlock7L
+.export BigQBlock8L, PJALL, PJARL, PJBLL, PJBRL, PJCLL, PJCRL, PJDLL, PJDRL, PJELL, PJERL, PJFLL, PJFRL
+.export W105L, W304L, W308L, W40F_BonusL, W502L, W608L, W802L
+
 Tile_Layout_TS14:
     ; This defines the individual 8x8 blocks used to construct one of the tiles
     ; Referenced by Address_Per_Tileset, addressed by Level_Tileset

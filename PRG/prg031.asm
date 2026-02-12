@@ -13,6 +13,18 @@
 
 ; DMC sounds are here!
 ; Note that due to limitation of the register, these sounds must be aligned on 64-byte ($40) boundaries
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_31"
+
+.export Clear_Nametable_Short, DynJump, IntIRQ, IntIRQ_32PixPart_HideSprites, IntIRQ_32PixelPartition_Part3
+.export IntIRQ_Finish_NoDis, IntNMI, IntReset, PRG031_F499, PRG031_FA3C, PRGROM_Change_A000, PRGROM_Change_Both2
+.export PRGROM_Change_C000, PT2_Full_CHRROM_Switch, Player_GetCard, Player_GetCardAndUpdate, Player_GetItem
+.export Read_Joypads, Reset_PPU_Clear_Nametables, Reset_PPU_Clear_Nametables2, Scroll_PPU_Reset, Sound1_XCTL_YRAMP
+.export Sound2_XCTL_YRAMP, Sound_PlayMusic, Sound_Sq1_NoteOn, Sound_Sq2_NoteOn, Sound_Sq2_NoteOn_NoPAPURAMP
+.export Sprite_RAM_Clear, StatusBar_DrawCardPiece, StatusBar_Update_Cards, VertLevel_ScreenH, VertLevel_ScreenL
 
 DMC01:  .byte $55, $55, $55, $95, $AA, $2A, $95, $E0, $7F, $FC, $C0, $F1, $03, $28, $FE, $FF
     .byte $FF, $F1, $5F, $3F, $00, $00, $00, $00, $00, $00, $08, $80, $C0, $F1, $FF, $C7
@@ -22,7 +34,7 @@ DMC01:  .byte $55, $55, $55, $95, $AA, $2A, $95, $E0, $7F, $FC, $C0, $F1, $03, $
     .byte $BF, $FF, $EF, $B6, $6D, $6F, $BB, $6D, $AF, $2A, $95, $94, $24, $49, $92, $88
     .byte $42, $84, $48, $88, $04, $09, $49, $92, $24, $51, $22, $A5, $92, $22, $49, $AA
     .byte $52, $A9, $AA, $5A, $55, $AD, $55, $55, $AD, $6D, $B5, $AD, $6D, $B5, $6D, $DB
-DMC01_End
+DMC01_End:
 
 DMC02:  .byte $55, $60, $6B, $79, $EA, $F8, $FF, $43, $82, $24, $00, $20, $8E, $ED, $C7, $A5
     .byte $1F, $10, $B7, $7F, $FF, $FF, $4D, $63, $C1, $15, $24, $41, $92, $28, $09, $4D
@@ -52,7 +64,7 @@ DMC02:  .byte $55, $60, $6B, $79, $EA, $F8, $FF, $43, $82, $24, $00, $20, $8E, $
     .byte $56, $5A, $A5, $95, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55
     .byte $55, $55, $55, $55, $55, $55, $53, $35, $55, $D5, $54, $55, $55, $55, $A9, $A5
     .byte $AA, $AA, $6A, $59, $69, $55, $55, $B5, $AA, $AA, $B2, $2C, $2B, $55, $55, $55
-DMC02_End
+DMC02_End:
 
     ;
 
@@ -119,41 +131,41 @@ PRG031_E2E1:
     ; play DMC02 and just continue on through code, which would be noisy.
 
 DMC_MODADDR_LUT:
-    .byte (DMC01 & $3FFF) >> 6   ; Sample  0 (DMC01)
-    .byte (DMC02 & $3FFF) >> 6   ; Sample  1 (DMC02)
-    .byte (DMC03 & $3FFF) >> 6   ; Sample  2 (DMC03)
-    .byte (DMC02 & $3FFF) >> 6   ; Sample  3 (DMC02 BAD SAMPLE LENGTH)
-    .byte (DMC04 & $3FFF) >> 6   ; Sample  4 (DMC04)
-    .byte (DMC05 & $3FFF) >> 6   ; Sample  5 (DMC05)
-    .byte (DMC05 & $3FFF) >> 6   ; Sample  6 (DMC05 3/4 length)
-    .byte (DMC06 & $3FFF) >> 6   ; Sample  7 (DMC06)
-    .byte (DMC06 & $3FFF) >> 6   ; Sample  8 (DMC06 slower)
-    .byte (DMC07 & $3FFF) >> 6   ; Sample  9 (DMC07)
-    .byte (DMC07 & $3FFF) >> 6   ; Sample 10 (DMC07 slower)
-    .byte (DMC05 & $3FFF) >> 6   ; Sample 11 (DMC05 1/2 length)
-    .byte (DMC08 & $3FFF) >> 6   ; Sample 12 (DMC08)
-    .byte (DMC09 & $3FFF) >> 6   ; Sample 13 (DMC09)
-    .byte (DMC09 & $3FFF) >> 6   ; Sample 14 (DMC09 slower)
-    .byte (DMC09 & $3FFF) >> 6   ; Sample 15 (DMC09 even slower)
+    .byte <((DMC01 & $3FFF) >> 6)   ; Sample  0 (DMC01)
+    .byte <((DMC02 & $3FFF) >> 6)   ; Sample  1 (DMC02)
+    .byte <((DMC03 & $3FFF) >> 6)   ; Sample  2 (DMC03)
+    .byte <((DMC02 & $3FFF) >> 6)   ; Sample  3 (DMC02 BAD SAMPLE LENGTH)
+    .byte <((DMC04 & $3FFF) >> 6)   ; Sample  4 (DMC04)
+    .byte <((DMC05 & $3FFF) >> 6)   ; Sample  5 (DMC05)
+    .byte <((DMC05 & $3FFF) >> 6)   ; Sample  6 (DMC05 3/4 length)
+    .byte <((DMC06 & $3FFF) >> 6)   ; Sample  7 (DMC06)
+    .byte <((DMC06 & $3FFF) >> 6)   ; Sample  8 (DMC06 slower)
+    .byte <((DMC07 & $3FFF) >> 6)   ; Sample  9 (DMC07)
+    .byte <((DMC07 & $3FFF) >> 6)   ; Sample 10 (DMC07 slower)
+    .byte <((DMC05 & $3FFF) >> 6)   ; Sample 11 (DMC05 1/2 length)
+    .byte <((DMC08 & $3FFF) >> 6)   ; Sample 12 (DMC08)
+    .byte <((DMC09 & $3FFF) >> 6)   ; Sample 13 (DMC09)
+    .byte <((DMC09 & $3FFF) >> 6)   ; Sample 14 (DMC09 slower)
+    .byte <((DMC09 & $3FFF) >> 6)   ; Sample 15 (DMC09 even slower)
 
 DMC_MODLEN_LUT:
     ; these are (value << 4) + 1, that is minimum 1 byte long to FF1 bytes
-    .byte (DMC01_End - DMC01) >> 4    ; Sample  0 (DMC01)
-    .byte (DMC02_End - DMC02) >> 4    ; Sample  1 (DMC02)
-    .byte (DMC03_End - DMC03) >> 4    ; Sample  2 (DMC03)
-    .byte (DMC02_Bad - DMC02) >> 4    ; Sample  3 (DMC02 BAD SAMPLE LENGTH)
-    .byte (DMC04_End - DMC04) >> 4    ; Sample  4 (DMC04)
-    .byte (DMC05_End - DMC05) >> 4    ; Sample  5 (DMC05)
-    .byte (DMC05_C - DMC05) >> 4  ; Sample  6 (DMC05 3/4 length)
-    .byte (DMC06_End - DMC06) >> 4    ; Sample  7 (DMC06)
-    .byte (DMC06_End - DMC06) >> 4    ; Sample  8 (DMC06 slower)
-    .byte (DMC07_End - DMC07) >> 4    ; Sample  9 (DMC07)
-    .byte (DMC07_End - DMC07) >> 4    ; Sample 10 (DMC07 slower)
-    .byte (DMC05_B - DMC05) >> 4  ; Sample 11 (DMC05 1/2 length)
-    .byte (DMC08_End - DMC08) >> 4    ; Sample 12 (DMC08)
-    .byte (DMC09_End - DMC09) >> 4    ; Sample 13 (DMC09)
-    .byte (DMC09_End - DMC09) >> 4    ; Sample 14 (DMC09 slower)
-    .byte (DMC09_End - DMC09) >> 4    ; Sample 15 (DMC09 even slower)
+    .byte <((DMC01_End - DMC01) >> 4)    ; Sample  0 (DMC01)
+    .byte <((DMC02_End - DMC02) >> 4)    ; Sample  1 (DMC02)
+    .byte <((DMC03_End - DMC03) >> 4)    ; Sample  2 (DMC03)
+    .byte <((DMC02_Bad - DMC02) >> 4)    ; Sample  3 (DMC02 BAD SAMPLE LENGTH)
+    .byte <((DMC04_End - DMC04) >> 4)    ; Sample  4 (DMC04)
+    .byte <((DMC05_End - DMC05) >> 4)    ; Sample  5 (DMC05)
+    .byte <((DMC05_C - DMC05) >> 4)  ; Sample  6 (DMC05 3/4 length)
+    .byte <((DMC06_End - DMC06) >> 4)    ; Sample  7 (DMC06)
+    .byte <((DMC06_End - DMC06) >> 4)    ; Sample  8 (DMC06 slower)
+    .byte <((DMC07_End - DMC07) >> 4)    ; Sample  9 (DMC07)
+    .byte <((DMC07_End - DMC07) >> 4)    ; Sample 10 (DMC07 slower)
+    .byte <((DMC05_B - DMC05) >> 4)  ; Sample 11 (DMC05 1/2 length)
+    .byte <((DMC08_End - DMC08) >> 4)    ; Sample 12 (DMC08)
+    .byte <((DMC09_End - DMC09) >> 4)    ; Sample 13 (DMC09)
+    .byte <((DMC09_End - DMC09) >> 4)    ; Sample 14 (DMC09 slower)
+    .byte <((DMC09_End - DMC09) >> 4)    ; Sample 15 (DMC09 even slower)
 
 DMC_MODCTL_LUT:
     .byte $0F   ; Sample  0 (DMC01)
@@ -560,7 +572,7 @@ Music_StopAll:
 PRG031_E518:
     JMP SndMus2A_Next ; Jump to SndMus2A_Next
 
-PRG031_E51B
+PRG031_E51B:
     JMP PRG031_E401  ; Jump to PRG031_E401
 
 PRG031_E51E:
@@ -1266,7 +1278,7 @@ DMC04:  .byte $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $
     .byte $4A, $55, $55, $2B, $55, $55, $55, $55, $AB, $54, $55, $2D, $AB, $4A, $55, $55
     .byte $B5, $2A, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55
     .byte $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55
-DMC04_End
+DMC04_End:
 
 DMC06:  .byte $55, $55, $55, $55, $55, $55, $D5, $AA, $D5, $37, $02, $00, $F4, $A3, $FF, $FF
     .byte $7F, $00, $2A, $00, $00, $80, $FF, $FF, $FF, $7F, $05, $00, $00, $E0, $FF, $1F
@@ -1324,7 +1336,7 @@ DMC06:  .byte $55, $55, $55, $55, $55, $55, $D5, $AA, $D5, $37, $02, $00, $F4, $
     .byte $5A, $AB, $55, $AB, $24, $55, $55, $55, $AA, $6A, $D5, $AA, $55, $55, $AA, $AA
     .byte $54, $55, $AB, $54, $AA, $55, $A9, $AA, $D5, $5A, $55, $55, $A9, $52, $95, $AA
     .byte $AA, $55, $B5, $6A, $55, $55, $4A, $55, $55, $95, $55, $55, $55, $2B, $55, $55
-DMC06_End
+DMC06_End:
 
 DMC09:  .byte $DA, $BB, $77, $7B, $B5, $6D, $AD, $5A, $B5, $D5, $54, $B5, $5B, $25, $91, $24
     .byte $21, $49, $A5, $54, $95, $2A, $A5, $AD, $12, $49, $68, $DB, $F7, $6E, $DB, $D6
@@ -1398,7 +1410,7 @@ DMC09:  .byte $DA, $BB, $77, $7B, $B5, $6D, $AD, $5A, $B5, $D5, $54, $B5, $5B, $
     .byte $AA, $AA, $52, $55, $A9, $52, $AA, $AA, $56, $55, $55, $A9, $6A, $55, $55, $55
     .byte $55, $55, $55, $55, $55, $55, $55, $B5, $D5, $AA, $AA, $AA, $4A, $49, $55, $55
     .byte $55, $55, $A9, $95, $AA, $AA, $AA, $5A, $55, $55, $AB, $AA, $AA, $AA, $54, $55
-DMC09_End
+DMC09_End:
 
 DMC05:  .byte $00, $FE, $FF, $5F, $62, $00, $00, $00, $FF, $FF, $FF, $27, $00, $00, $E8, $FF
     .byte $FF, $07, $00, $FC, $FF, $FF, $FF, $00, $00, $00, $F8, $FF, $03, $00, $80, $FD
@@ -1432,7 +1444,7 @@ DMC05_C:.byte $AB, $8A, $42, $A5, $F6, $B2, $25, $49, $56, $6D, $B5, $A9, $94, $
     .byte $22, $01, $69, $DF, $B7, $96, $22, $24, $69, $DF, $5E, $95, $12, $29, $69, $5B
     .byte $AB, $A9, $20, $A9, $6D, $6F, $5B, $51, $2A, $55, $96, $AC, $4A, $B5, $2D, $4B
     .byte $A9, $65, $55, $95, $AD, $2A, $95, $A5, $D4, $6A, $57, $25, $92, $AA, $DA, $6D
-DMC05_End
+DMC05_End:
 
 
 
@@ -3520,17 +3532,3 @@ PRGROM_Change_C000: ; $FFD1
 
     ; Signature?
     .byte $00, $00, $6C, $56, $03, $00, $01, $0C, $01, $2D
-
-    ; ASSEMBLER BOUNDARY CHECK, END OF $FFFA
-    .pad $FFFA, $FF
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-; VECTORS
-; Must appear at $FFFA
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    .base $FFFA
-Vector_Table:
-    .word IntNMI    ; $FFFA - NMI Interrupt (VBlank)
-    .word IntReset  ; $FFFC - Reset Interrupt (boot up)
-    .word IntIRQ    ; $FFFE - IRQ Interrupt (scanline from MMC3)
-

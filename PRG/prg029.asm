@@ -11,6 +11,17 @@
 ; This source file last updated: 2012-03-06 18:57:13.927921102 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_29"
+
+.export BlockChange_Do, M12ASegData1B, M12ASegData1C, M12ASegData1D, M12ASegData1E, M12ASegData1F
+.export M12ASegData20, M12ASegData21, M12ASegData22, M12ASegData23, M2BSegData07, M2BSegData08
+.export M2BSegData09, M2BSegData0A, M2BSegData14, M2BSegData15, M2BSegData1A, Player_Draw
+.export Player_DrawAndDoActions, ToadHouse_ChestPressB
+
 M2BSegData14:
     .byte $98, $56, $56, $90, $54, $56, $94, $7E, $98, $56, $5A, $5A, $90, $58, $5A, $94 ; $C000 - $C00F
     .byte $7E, $98, $5A, $00, $98, $5C, $5C, $90, $5A, $5C, $94, $7E, $98, $5C, $60, $60 ; $C010 - $C01F
@@ -380,7 +391,7 @@ Player_FramePageOff:
     .byte 3
 
 PRG029_CE88:
-    .byte -8, 10, -8, 18,  8, 10,  8, 18,  1,  9,  0,  8,  2, 10, -2, 6
+    .byte <-8, 10, <-8, 18,  8, 10,  8, 18,  1,  9,  0,  8,  2, 10, <-2, 6
 
     ; Specified root VROM page for a given power up
 Player_PUpRootPage:
@@ -608,7 +619,7 @@ PRG029_CF88:
     ; Reverse these X values
     LDA Sprite_RAM+$0B,X
     CLC
-    ADC #-24
+    ADC #<-24
     STA Sprite_RAM+$0B,X
     STA Sprite_RAM+$17,X
 
@@ -705,8 +716,8 @@ PRG029_D050:
     LDA Sprite_RAM+$00,X
     STA Sprite_RAM+$14,X
 
-    ; If Player is not horizontally flipped, A = -8, otherwise A = 16
-    LDA #-8
+    ; If Player is not horizontally flipped, A = <-8, otherwise A = 16
+    LDA #<-8
     LDY Player_FlipBits
     BEQ PRG029_D064
     LDA #16
@@ -736,7 +747,7 @@ PRG029_D076:
     STA Sprite_RAM+$14,X
 
     CLC
-    ADC #-16
+    ADC #<-16
     STA Sprite_RAM+$00,X
     STA Sprite_RAM+$04,X
     STA Sprite_RAM+$08,X
@@ -1016,7 +1027,7 @@ PRG029_D1D5:
     LDA Level_CoinHeav
     BPL PRG029_D205  ; If Level_CoinHeav >= 0, jump to PRG029_D205
 
-    ; Note that by above logic, Level_CoinHeav must be <= -1...
+    ; Note that by above logic, Level_CoinHeav must be <= <-1...
     ; Technically, it is set to $80 (-128) at start!
 
     ; Release holding anything and stop horizontal movement
@@ -1212,8 +1223,8 @@ AirshipCtl_RunAndJump:
     BLT PRG029_D2D0  ; If Horz_Scroll < $80, jump to PRG029_D2D0
 
     ; Player makes the jump!
-    LDA #-$60
-    STA Player_YVel     ; Player_YVel = -$60
+    LDA #<-$60
+    STA Player_YVel     ; Player_YVel = <-$60
     INC Level_AirshipCtl     ; Next Level_AirshipCtl!
 
 PRG029_D2D0:
@@ -1261,8 +1272,8 @@ AirshipCtl_HoldAnchor:
     LDA #$02
     STA Player_FlipBits     ; Player_FlipBits = 2 (use "caught anchor" frame)
 
-    LDA #-$14
-    STA Player_YVel ; Player_YVel = -$14
+    LDA #<-$14
+    STA Player_YVel ; Player_YVel = <-$14
     JSR PRG029_D457  ; Continue using the "run" code
 
     LDA Vert_Scroll
@@ -1471,9 +1482,9 @@ PRG029_D3EC:
 
 
     ; When Player has grabbed wand, offset from Player X/Y by suit / power-up
-Wand_XOff_BySuitL:  .byte -5, -5, -5, -5, -7, -5, -5
+Wand_XOff_BySuitL:  .byte <-5, <-5, <-5, <-5, <-7, <-5, <-5
 Wand_XOff_BySuitR:  .byte  6,  6,  6,  6,  8,  6,  6
-Wand_YOff_BySuit:   .byte  1, -9, -9, -9,  3, -9, -9
+Wand_YOff_BySuit:   .byte  1, <-9, <-9, <-9,  3, <-9, <-9
 
 Wand_Offset_BySuit:
     LDY Object_SprRAM+5 ; Y = 5th index object Sprite RAM offset
@@ -1619,16 +1630,16 @@ Pipe_Move_JumpTable:
     .word Pipe_Transit      ; 5 - In-level transit
 
     ; For horizontal pipe movement, X velocity right and left, respectively
-PipeMove_XVel:  .byte 8, -8
+PipeMove_XVel:  .byte 8, <-8
 
     ; For vertical pipe movement, Y velocity down and up, respectively
-PipeMove_YVel:  .byte 8, -8
+PipeMove_YVel:  .byte 8, <-8
 
     ; This sets the Scroll_LastDir variable based on travel direction (right and left, respectively)
 PipeMove_LR_Dir:    .byte 0, 1
 
     ; This adds to Horz_Scroll based on travel direction (right and left, respectively)
-PipeMove_LR:    .byte 1, -1
+PipeMove_LR:    .byte 1, <-1
 
     ; High byte sign extension to values in table immediately above
 PipeMove_LRH:   .byte $00, $FF
@@ -1795,7 +1806,7 @@ Pipe_Transit:
     ; point to the uppermost scroll point and visually act strangely
     ; if you try to go somewhere short of that at either end.
 
-    LDA #-2      ; A = -2 (scroll upward)
+    LDA #<-2      ; A = <-2 (scroll upward)
     LDX #$01     ; X = 1
     LDY Player_YVel ; Y = Player_YVel
     BMI PRG029_D56F  ; If Player_YVel < 0, jump to PRG029_D56F
@@ -1805,7 +1816,7 @@ Pipe_Transit:
     DEX      ; X = 0
 
 PRG029_D56F:
-    STA Pipe_TransYDelta     ; Pipe_TransYDelta = -2 (going up) or 2 (going down)
+    STA Pipe_TransYDelta     ; Pipe_TransYDelta = <-2 (going up) or 2 (going down)
 
     CLC
     ADC Vert_Scroll
@@ -1868,7 +1879,7 @@ PRG029_D59B:
     ; Player was going up
 
     DEC Player_YHi  ; Player_YHi--
-    LDA #-16     ; A = 16
+    LDA #<-16     ; A = 16
 
 PRG029_D5B8:
     CLC
@@ -1894,8 +1905,8 @@ PipeTransit_XYOffsets:
     .byte  2, 14,  2,  2    ; Moving down
 
     ; This is actually access as a contiguous array, but might as well be clear
-PipeTransit_YDelta: .byte 2, -2 ; Y Deltas while moving through pipes (down and up)
-PipeTransit_XDelta: .byte 2, -2 ; X Deltas while moving through pipes (right and left)
+PipeTransit_YDelta: .byte 2, <-2 ; Y Deltas while moving through pipes (down and up)
+PipeTransit_XDelta: .byte 2, <-2 ; X Deltas while moving through pipes (right and left)
 
     ; Sets Level_PipeExitDir appropriately based on direction
 Level_PipeExitDirTable: .byte $03, $04, $02, $01
@@ -2687,7 +2698,7 @@ TileChng_DoorBufCmds:
     .byte $00, $00, VU_VERT | VU_REPEAT | 4, $FC    ; Left 4 patterns of door
     .byte $00, $00, VU_VERT | VU_REPEAT | 4, $FC    ; Right 4 patterns of door
     .byte $00   ; Terminator
-TileChng_DoorBufCmds_End
+TileChng_DoorBufCmds_End:
 
 TileChng_DoorAppear:
 
@@ -2773,7 +2784,7 @@ PRG029_DDA2:
     ; Set low address for right column of patterns of door
     STA Graphics_Buffer+$05,X
 
-    ; Add array size -1 to graphics buffer count
+    ; Add array size <-1 to graphics buffer count
     LDA Graphics_BufCnt
     CLC
     ADC #TileChng_DoorBufCmds_End - TileChng_DoorBufCmds - 1
@@ -2786,7 +2797,7 @@ TileChng_ToadBoxBufCmds:
     .byte $00, $00, $04, $50, $51, $52, $53 ; Chest top patterns
     .byte $00, $00, $04, $54, $55, $56, $57 ; Chest bottom patterns
     .byte $00   ; Terminator
-TileChng_ToadBoxBufCmds_End
+TileChng_ToadBoxBufCmds_End:
 
 TileChng_ToadBoxOpen:
     ; Level_ChgTileEvent = 0 (we're handling it)
@@ -2862,7 +2873,7 @@ PRG029_DE0E:
     ; Set low address for second row of open chest patterns
     STA Graphics_Buffer+$08,X
 
-    ; Add array size -1 to graphics buffer count
+    ; Add array size <-1 to graphics buffer count
     LDA Graphics_BufCnt
     CLC
     ADC #TileChng_ToadBoxBufCmds_End - TileChng_ToadBoxBufCmds - 1
@@ -3086,7 +3097,7 @@ PRG029_DF4C:
     CMP #$02
     BNE PRG029_DF1B  ; While Temp_Var3 < 2, loop!
 
-    ; Add array size -1 to graphics buffer count
+    ; Add array size <-1 to graphics buffer count
     LDA Graphics_BufCnt
     CLC
     ADC #CBIG_BCSize - 1

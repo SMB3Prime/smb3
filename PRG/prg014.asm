@@ -11,6 +11,29 @@
 ; This source file last updated: 2012-01-05 18:11:17.050297840 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_14"
+
+.export LeveLoad_FixedSizeGen_TS18, LevelLoad_TS18, LoadLevel_BGBush, LoadLevel_BGOrWater, LoadLevel_BigSizeBush
+.export LoadLevel_BlockRun, LoadLevel_BrickAndShadow, LoadLevel_CCBridge, LoadLevel_Cannon, LoadLevel_CloudRun
+.export LoadLevel_CloudRun3, LoadLevel_Conveyor, LoadLevel_Corner, LoadLevel_DecoCeiling, LoadLevel_DecoGround
+.export LoadLevel_DonutLifts, LoadLevel_Door1, LoadLevel_Door2, LoadLevel_EndGoal, LoadLevel_FillBackground
+.export LoadLevel_FloatingBigBlock, LoadLevel_GenerateBigBlock, LoadLevel_Generator_TS18, LoadLevel_GroundRun
+.export LoadLevel_HLeftWallPipeRun, LoadLevel_HRightWallPipeRun, LoadLevel_HRightWallPipeRun3, LoadLevel_IceBricks
+.export LoadLevel_Jelectro, LoadLevel_Lava, LoadLevel_LittleBushRun, LoadLevel_LittleCloudRun, LoadLevel_LittleCloudSolidRun
+.export LoadLevel_MidSizeBush, LoadLevel_MiscBG, LoadLevel_NextColumn, LoadLevel_Nothing, LoadLevel_Path45B2T
+.export LoadLevel_Path45T2B, LoadLevel_Path625B2T, LoadLevel_Path625T2B, LoadLevel_PathHorizontal, LoadLevel_PathVertical
+.export LoadLevel_Pillar, LoadLevel_Pillar_BG, LoadLevel_Pitfall, LoadLevel_PitfallW, LoadLevel_PowerBlock
+.export LoadLevel_PrefabBlock, LoadLevel_PutLittleBGCloud, LoadLevel_RandomPUpClouds, LoadLevel_Slope225B2T
+.export LoadLevel_Slope225B2TCeiling, LoadLevel_Slope225T2B, LoadLevel_Slope225T2BCeiling, LoadLevel_Slope45B2T
+.export LoadLevel_Slope45B2TCeiling, LoadLevel_Slope45T2B, LoadLevel_Slope45T2BCeiling, LoadLevel_SmallSizeBush
+.export LoadLevel_StoreJctStart, LoadLevel_ThroneRoom, LoadLevel_TopDecoBlocks, LoadLevel_Tunnel, LoadLevel_VCeilingPipeRun
+.export LoadLevel_VGroundPipe5Run, LoadLevel_VGroundPipeRun, LoadLevel_VTransitPipeRun, LoadLevel_VertGroundL
+.export LoadLevel_VertGroundR, LoadLevel_VineToGround, Tile_Attributes_TS18, Tile_Layout_TS18, Vs_Battlefields
+
 Tile_Layout_TS18:
     ; This defines the individual 8x8 blocks used to construct one of the tiles
     ; Referenced by Address_Per_Tileset, addressed by Level_Tileset
@@ -352,7 +375,7 @@ LoadLevel_VsQBlock:
 Vs_StatusBarTiles:
     .byte TILE18_MSTATUS_UL, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_MSTATUS_UR, TILE18_LSTATUS_UL, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_STATUS_UM, TILE18_LSTATUS_UR
     .byte TILE18_MSTATUS_LL, TILE18_MSTATUS_LML, TILE18_STATUS_LM, TILE18_STATUS_LM, TILE18_MSTATUS_LR, TILE18_LSTATUS_LL, TILE18_LSTATUS_LML, TILE18_STATUS_LM, TILE18_STATUS_LM, TILE18_LSTATUS_LR
-Vs_StatusBarTiles_End
+Vs_StatusBarTiles_End:
 
 LoadLevel_VsStatusBar:
     LDX #$00        ; X = 0
@@ -1054,7 +1077,7 @@ LL_Goal_TSetAddr:   ; by tileset...
     ; Same list of recognized tilesets as hardcoded in PRG014_C862
 LL_Goal_TSetList:
     .byte 1, 4, 9, 13, 12, 3, 14
-LL_Goal_TSetListEnd
+LL_Goal_TSetListEnd:
 
 
 LoadLevel_EndGoalDecoSquare:
@@ -2179,8 +2202,8 @@ PRG014_CF8A:
 
     DEC Temp_Var5       ; Temp_Var5--
     LDA Temp_Var5
-    CMP #-1
-    BNE PRG014_CF8A     ; While Temp_Var5 <> -1, loop!
+    CMP #<-1
+    BNE PRG014_CF8A     ; While Temp_Var5 <> <-1, loop!
 
     ; After loop...
 
@@ -2220,8 +2243,8 @@ PRG014_CFBD:
 
     DEC Temp_Var5       ; Temp_Var5--
     LDA Temp_Var5
-    CMP #-1
-    BNE PRG014_CFBD     ; While Temp_Var5 <> -1, loop!
+    CMP #<-1
+    BNE PRG014_CFBD     ; While Temp_Var5 <> <-1, loop!
 
     JMP PRG014_CF9A  ; Jump to PRG014_CF9A
 
@@ -2383,7 +2406,7 @@ LL_BigBlock_ShadowChks:
     .byte TILE1_BUSH_FUL, TILE1_BUSH_FBL, TILE1_BUSH_FUR, TILE1_BUSH_FBR
 
     .byte TILE1_BUSH_MID
-LL_BigBlock_EndShadowChks
+LL_BigBlock_EndShadowChks:
 
 
     ; Array of values (matching array above) for correct shadow
@@ -4985,9 +5008,9 @@ LoadLevel_ThroneRoom:
     LDY TileAddr_Off     ; Y = TileAddr_Off
 
     ; Temp_Var1/2 point to LL_ThroneRoom
-    LDA #LL_ThroneRoom & $FF
+    LDA #<LL_ThroneRoom
     STA Temp_Var1
-    LDA #LL_ThroneRoom >> 8
+    LDA #>LL_ThroneRoom
     STA Temp_Var2
 
 PRG014_DF41:
@@ -5056,7 +5079,7 @@ LoadLevel_CheckBGHMem:
     ADC Temp_Var16     ; Add in the second value read
     TAY         ; Y = original width - remaining width + Temp_Var16
 
-PRG014_DF8C
+PRG014_DF8C:
     TYA         ; A = Y
     AND #%11111000
     LSR A

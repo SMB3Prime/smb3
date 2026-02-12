@@ -11,6 +11,16 @@
 ; This source file last updated: 2012-03-05 22:51:55.464428532 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_08"
+
+.export Airship_JumpFrameByPup, AutoScroll_CalcPlayerY, Object_BumpOffBlocks, PRG008_A224, PRG008_A38E
+.export PipeMove_SetPlayerFrame, Player_ApplyXVelocity, Player_ApplyYVelocity, Player_ClimbFrame, Player_DoGameplay
+.export Player_DoScrolling, Player_GetTileAndSlope, Player_GrowFrames, Player_KuriboFrame, Player_WalkFramesByPUp
+
 Level_TilesetIdx_ByTileset:
     ; Basically Level_TilesetIdx is just Level_Tileset - 1
     .byte $FF   ;  0 Map (UNUSED)
@@ -909,7 +919,7 @@ PRG008_A45A:
 
     LDA Player_SpriteX
     CMP #$f8
-    BLT PRG008_A472  ; Intended meaning: If Player_SpriteX > -8, jump to PRG008_A472
+    BLT PRG008_A472  ; Intended meaning: If Player_SpriteX > <-8, jump to PRG008_A472
 
     ; Player_SpriteX has been pushed too far left! Assumed crushed!
     ; (Except in Vertical levels or if the level was completed)
@@ -949,7 +959,7 @@ PRG008_A472:
 
 VibrationOffset:
     .byte 0,  2,  3,  1 ; For when 0 >= Vert_Scroll >= $7F
-    .byte 0, -2, -3, -1 ; For when $80 >= Vert_Scrol >= $FF
+    .byte 0, <-2, <-3, <-1 ; For when $80 >= Vert_Scrol >= $FF
 
     ; Simple function which updates the "Shake" effect from something heavy
 Player_DoVibration:
@@ -1150,20 +1160,20 @@ Player_XAccelMain:
     ; F = "Friction" (stopping rate), "N = "Normal" accel, S = "Skid" accel, X = unused
     ; Without B button  With B button
     ;      F   N   S   X     F   N   S   X
-    .byte -1,  0,  2,  0,   -1,  0,  2,  0  ; Small
-    .byte -1,  0,  2,  0,   -1,  0,  2,  0  ; Big
-    .byte -1,  0,  2,  0,   -1,  0,  2,  0  ; Fire
-    .byte -1,  0,  2,  0,   -1,  0,  2,  0  ; Leaf
-    .byte -1,  2,  2,  0,   -1,  2,  2,  0  ; Frog
-    .byte -1,  0,  2,  0,   -1,  0,  2,  0  ; Tanooki
-    .byte -1,  0,  2,  0,   -1,  0,  2,  0  ; Hammer
+    .byte <-1,  0,  2,  0,   <-1,  0,  2,  0  ; Small
+    .byte <-1,  0,  2,  0,   <-1,  0,  2,  0  ; Big
+    .byte <-1,  0,  2,  0,   <-1,  0,  2,  0  ; Fire
+    .byte <-1,  0,  2,  0,   <-1,  0,  2,  0  ; Leaf
+    .byte <-1,  2,  2,  0,   <-1,  2,  2,  0  ; Frog
+    .byte <-1,  0,  2,  0,   <-1,  0,  2,  0  ; Tanooki
+    .byte <-1,  0,  2,  0,   <-1,  0,  2,  0  ; Hammer
 
 Player_XAccelMain_UW:
     ; If on the ground  If swimming above the ground
-    .byte -1,  1,  1,  0,   -1,  0,  0,  0
+    .byte <-1,  1,  1,  0,   <-1,  0,  0,  0
 
-    .byte -1,  0,  0,  0,   -1,  0,  1,  0
-    .byte -1,  0,  0,  0,   -1,  0,  0,  0
+    .byte <-1,  0,  0,  0,   <-1,  0,  1,  0
+    .byte <-1,  0,  0,  0,   <-1,  0,  0,  0
 
 
     ; The following values are added to the "Counter_Wiggly"
@@ -1586,11 +1596,11 @@ PRG008_A7DE:
 
 PRG008_A7E2:
     LDY Player_YVel
-    CPY #-$0C
-    BGS PRG008_A7EA  ; If Player_YVel >= -$0C, jump to PRG008_A7EA
+    CPY #<-$0C
+    BGS PRG008_A7EA  ; If Player_YVel >= <-$0C, jump to PRG008_A7EA
 
-    ; Prevent Player_YVel from being less than -$0C
-    LDY #-$0C
+    ; Prevent Player_YVel from being less than <-$0C
+    LDY #<-$0C
 
 PRG008_A7EA:
     LDA Counter_1
@@ -1618,8 +1628,8 @@ PRG008_A7F1:
     BNE PRG008_A827  ; If Player is not pressing UP + A, jump to PRG008_A827
 
     ; Player wants to exit water!
-    LDA #-$34
-    STA Player_YVel ; Player_YVel = -$34 (exit velocity from water)
+    LDA #<-$34
+    STA Player_YVel ; Player_YVel = <-$34 (exit velocity from water)
 
 PRG008_A80B:
 
@@ -1787,7 +1797,7 @@ PRG008_A8B7:
     CMP #TILE1_VINE
     BNE PRG008_A8CA  ; If tile is NOT another vine, jump to PRG008_A8CA
 
-    LDY #-$10
+    LDY #<-$10
     STY Player_InAir ; Flag Player as "in air"
 
 PRG008_A8C8:
@@ -1803,7 +1813,7 @@ PRG008_A8CA:
     AND #PAD_LEFT
     BEQ PRG008_A8D8  ; If Player is NOT pressing LEFT, jump to PRG008_A8D8
 
-    LDY #-$10    ; Y = -$10 (leftward X velocity)
+    LDY #<-$10    ; Y = <-$10 (leftward X velocity)
 
 PRG008_A8D8:
     STY Player_XVel ; Set Player's X Velocity
@@ -2093,7 +2103,7 @@ Frog_FrameOffset:
 
     ; Base velocity for frog swim right/down, left/up
 Frog_Velocity:
-    .byte 16, -16
+    .byte 16, <-16
 
 Swim_Frog:
     LDX #$ff     ; X = $FF
@@ -2286,8 +2296,8 @@ PRG008_AAFF:
     BEQ PRG008_AB25     ; If Player is not pressing left or right, jump to PRG008_AB25
     INC Player_InAir    ; Flag as in air (Kuribo's shoe bounces along)
 
-    LDY #-$20
-    STY Player_YVel     ; Player_YVel = -$20
+    LDY #<-$20
+    STY Player_YVel     ; Player_YVel = <-$20
 
 PRG008_AB17:
     LDA Pad_Input
@@ -2663,8 +2673,8 @@ PRG008_ACB3:
     LDY #$05     ; Y = 5
 
     LDA Player_YVel
-    CMP #-$20
-    BGS PRG008_ACC8  ; If Player's Y velocity >= -$20, jump to PRG008_ACC8
+    CMP #<-$20
+    BGS PRG008_ACC8  ; If Player's Y velocity >= <-$20, jump to PRG008_ACC8
 
     LDA Player_mGoomba
     BNE PRG008_ACCD  ; If Player has got a microgoomba stuck to him, jump to PRG008_ACCD
@@ -2825,7 +2835,7 @@ PRG008_AD5C:
     BPL PRG008_AD73  ; If Player is not above top of screen, jump to PRG008_AD73
 
     ABS_LDY Player_SpriteY ; LDY Player_SpriteY
-    CPY #-8
+    CPY #<-8
     BGE PRG008_AD73  ; If Player sprite is a bit high up, jump to PRG008_AD73
 
     CLC
@@ -3528,7 +3538,7 @@ PRG008_B082:
     ABS_ORA Player_WagCount ; ORA Player_WagCount
     BEQ PRG008_B09F  ; If flying or fluttering, jump to PRG008_B09F (RTS)
 
-    LDY #-1      ; Y = -1
+    LDY #<-1      ; Y = <-1
     LDA Player_XVel
     BPL PRG008_B095  ; If Player_XVel >= 0, jump to PRG008_B095
 
@@ -3537,7 +3547,7 @@ PRG008_B082:
 
 PRG008_B095:
 
-    ; Y = -1 and Player_XVel >= 0
+    ; Y = <-1 and Player_XVel >= 0
     ;    OR
     ; Y = 1 and Player_XVel < 0
     ;    (but magnitude is in 'A' either way)
@@ -3982,12 +3992,12 @@ PRG008_B258:
     SBC #$30
     BCS PRG008_B284  ; If there was no borrow, jump to PRG008_B284
 
-    ; Minimum vertical scroll delta is -3
-    CMP #-3
-    BGE PRG008_B274  ; If difference is -3 or above, jump to PRG008_B274
+    ; Minimum vertical scroll delta is <-3
+    CMP #<-3
+    BGE PRG008_B274  ; If difference is <-3 or above, jump to PRG008_B274
 
 PRG008_B272:
-    LDA #-3     ; Otherwise, enforce -3 minimum
+    LDA #<-3     ; Otherwise, enforce <-3 minimum
 
 PRG008_B274:
     STA Level_ScrollDiffV ; Store as vertical difference
@@ -4068,12 +4078,12 @@ PRG008_B2AB:
     SBC #$30
     BCS PRG008_B2F9  ; If no borrow occurred, jump to PRG008_B2F9
 
-    ; Minimum vertical scroll delta value is -3
+    ; Minimum vertical scroll delta value is <-3
     DEC Level_VertScrollH
-    CMP #-3
+    CMP #<-3
     BGE PRG008_B2D8
 
-    LDA #-3
+    LDA #<-3
 
 PRG008_B2D8:
     STA Level_ScrollDiffV    ; Set difference
@@ -4572,7 +4582,7 @@ PRG008_B4F3:
     BGS PRG008_B511  ; If Player is on the right side of the tile, jump to PRG008_B511
 
     ; Otherwise...
-    LDY #-1      ; Y = -1
+    LDY #<-1      ; Y = <-1
     INX      ; X = 1
 
 PRG008_B511:
@@ -4590,7 +4600,7 @@ PRG008_B517:
     AND #$0f
     BEQ PRG008_B53B  ; If Player is on new tile, jump to PRG008_B53B
 
-    TYA      ; A = 1 or -1
+    TYA      ; A = 1 or <-1
     BPL PRG008_B526  ; If the positive version, jump to PRG008_B526
 
     DEC Player_XHi  ; When negative, decrement the "Hi" component
@@ -4900,7 +4910,7 @@ LATP_QBlocks:   .byte $01, $02, $03, $04, $05, $04, $00, $06, $01, $02, $03, $04
 LATP_InvisCoin: .byte $04, $09, $00
 LATP_InvisNote: .byte $00
 LATP_PWrksJct:  .byte $0B   ; UNUSED breakable pipeworks junction tile!
-LATP_End
+LATP_End:
 
 
     ; After a block is hit, it does the little bounce thing, and then
@@ -5338,8 +5348,8 @@ PRG008_B84E:
     STA BrickBust_XDist  ; Reset X fan out distance
     STA BrickBust_HEn    ; Reset horizontal enablers
 
-    LDA #-6
-    STA BrickBust_YVel   ; Y velocity = -6
+    LDA #<-6
+    STA BrickBust_YVel   ; Y velocity = <-6
 
     LDA #$01
     STA Score_Earned     ; 10 points!
@@ -5502,7 +5512,7 @@ PRG008_B948:
 
 
 Player_TailAttack_Offsets: ; (Y and X)
-    .byte 28, -6    ; Player not horizontally flipped
+    .byte 28, <-6    ; Player not horizontally flipped
     .byte 28, 21    ; Player horizontally flipped
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -5621,9 +5631,9 @@ PRG008_B9D3:
     ; "Slope correction" values; as Player transitions from one slope tile to the next,
     ; slight Player_Y correction is needed to keep him on track.  The left value pairs
     ; are for when moving up a slope, the right pair is for when moving down a slope.
-    ; Thus -1 to bump up to then next tile going up, or +16 to bump down when going down
+    ; Thus <-1 to bump up to then next tile going up, or +16 to bump down when going down
 Slope_CorrectH: .byte $FF, $00  ; sign extension of next two values
-Slope_CorrectL: .byte -1, 16
+Slope_CorrectL: .byte <-1, 16
 
 PRG000_B9D8:    ; <-- go back up from here
     LDY #TileAttrAndQuad_OffsSloped_Sm - TileAttrAndQuad_OffsSloped + 6         ; Y = $16 (Player small or ducking)
@@ -5793,7 +5803,7 @@ PRG008_BA77:
 
     ; Otherwise...
     INX      ; X = 1
-    LDY #-1      ; Y = -1
+    LDY #<-1      ; Y = <-1
 
 PRG008_BA92:
     LDA PRG008_B3B0,X ; Get appropriate offset
@@ -5803,7 +5813,7 @@ PRG008_BA92:
     BEQ PRG008_BABC  ; If result = 0, jump to PRG008_BABC
 
     TYA
-    BPL PRG008_BAA1  ; If Y is not -1, jump to PRG008_BAA1
+    BPL PRG008_BAA1  ; If Y is not <-1, jump to PRG008_BAA1
 
     DEC Player_XHi  ; Otherwise, Player_XHi--
 
@@ -6006,8 +6016,8 @@ PRG008_BB69:
     ; Player is mid air...
 
     LDA Player_YVel
-    CMP #-$1c
-    BLS PRG008_BB1A  ; If Player Y velocity < -$1C, jump to PRG008_BB1A (RTS)
+    CMP #<-$1c
+    BLS PRG008_BB1A  ; If Player Y velocity < <-$1C, jump to PRG008_BB1A (RTS)
 
     ; Get difference between Player and ground slope height
 
@@ -6111,11 +6121,11 @@ PRG008_BBED:
     BLS PRG008_BBFD  ; If magnitude of Player_Slide < $40, jump to PRG008_BBFD
 
     ; Player is sliding too fast!!
-    ; If Player_Slide is negative, stop it at -$40, otherwise stop it at $40
+    ; If Player_Slide is negative, stop it at <-$40, otherwise stop it at $40
     LDY #$40
     LDA Player_Slide
     BPL PRG008_BBFA
-    LDY #-$40
+    LDY #<-$40
 PRG008_BBFA:
     STY Player_Slide
 
@@ -6206,7 +6216,7 @@ Pipe_PadDirForEnter:
 
 
     ; The sliding values applied when Player is touching a conveyor
-ConveyorSlide:  .byte 16, -16
+ConveyorSlide:  .byte 16, <-16
 
     .byte $01, $0F
 
@@ -6740,7 +6750,7 @@ PRG008_BEAC:
     SEC
     SBC Player_SandSink  ; Get difference between Player_Y and top of quicksand
 
-    LDY #-$20    ; Y = -$20 (escape jump vel)
+    LDY #<-$20    ; Y = <-$20 (escape jump vel)
     TAX      ; difference -> 'X'
     AND #%11110000   ; Keep only upper 4 bits
     BNE PRG008_BEC7  ; If Player is not at top of sand, jump to PRG008_BEC7
@@ -6751,7 +6761,7 @@ PRG008_BEAC:
     CMP #$03
     BGE PRG008_BEC7  ; If still at least 3 pixels under, jump to PRG008_BEC7
 
-    LDY #-$30    ; Otherwise, Y = -$30 (escape jump vel, almost out!)
+    LDY #<-$30    ; Otherwise, Y = <-$30 (escape jump vel, almost out!)
 
 PRG008_BEC7:
     LDA Pad_Input
@@ -6826,7 +6836,7 @@ PipeEnter_XYOffs:
     .byte 16,   0   ; right
     .byte  0,   0   ; left
     .byte  0,  32   ; up
-    .byte  0, -16   ; down  <-- not applied if Player is small
+    .byte  0, <-16   ; down  <-- not applied if Player is small
 
 
     ; Does common stuff to prepare to enter a pipe!
@@ -6961,7 +6971,7 @@ Player_ApplyXVelocity:
     LDA Player_XVel
     BPL PRG008_BFAC  ; If Player_XVel >= 0, jump to Player_ApplyXVelocity
 
-    LDY #-PLAYER_MAXSPEED    ; Y = -PLAYER_MAXSPEED
+    LDY #<-PLAYER_MAXSPEED    ; Y = -PLAYER_MAXSPEED
 
     ; Negate Player_XVel (get absolute value)
     NEG

@@ -11,6 +11,16 @@
 ; This source file last updated: 2012-03-12 22:48:24.881635889 -0500
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_26"
+
+.export HandleLevelJunction, LevelLoad_CopyObjectList, Level_Opening_Effect, Map_DoInventory_And_PoofFX
+.export Map_EnterLevel_Effect, Palette_FadeIn, Palette_FadeOut, Palette_PrepareFadeOut, Scroll_Commit_Column
+.export Scroll_ToVRAM_Apply, StatusBar_Fill_MorL, StatusBar_Fill_Score, StatusBar_Fill_World, StatusBar_UpdateValues
+.export TileChng_VRAMCommit, Video_Misc_Updates
 
 ; FIXME: Appears to be unused Video_Upd_Table format data??
     .byte $20, $E6, $05, $F1, $FC, $9D, $9C, $9E, $21, $26, $05, $F2, $FC, $9D, $9C, $9E ; $0000 - $000F
@@ -652,13 +662,13 @@ PRG026_A3FB:
     RTS      ; Return
 
 ; These tables really define a lot of behavior for the inventory item menu
-InvItem_AddSub:     .byte 7, -7 ; Press down to go forward 7 items, up to go back 7 items
-InvItem_IndexOOR:   .byte 28, -7    ; Out-of-range index values for wrap-around when pressing down/up
+InvItem_AddSub:     .byte 7, <-7 ; Press down to go forward 7 items, up to go back 7 items
+InvItem_IndexOOR:   .byte 28, <-7    ; Out-of-range index values for wrap-around when pressing down/up
 InvItem_Wrap:       .byte 0, 21 ; Wrap-around values for Inventory start
-InvItem_NextPrior:  .byte 24, -24   ; Whether left or right was pressed, how to add/sub the highlight X position
+InvItem_NextPrior:  .byte 24, <-24   ; Whether left or right was pressed, how to add/sub the highlight X position
 InvItem_HiliteOORX: .byte 240, 48   ; Highlight out-of-range X position to tell when at ends, for right/left
 InvItem_HiliteMinMax:   .byte 72, 216   ; Highlight left min and right max for right/left overflows
-InvItem_RightLeft:  .byte 1, -1 ; Whether right or left was pressed, how to inc/dec the highlight index
+InvItem_RightLeft:  .byte 1, <-1 ; Whether right or left was pressed, how to inc/dec the highlight index
 InvItem_RightLeftMinMax:.byte 0, 6  ; Right/left overflows wrap-around index value
 InvItem_PerPlayerOff:   .byte $00, (Inventory_Items2 - Inventory_Items) ; Offset per player
 Inventory_DoPowerupUse:

@@ -11,6 +11,11 @@
 ; This source file last updated: 2012-03-19 22:50:51.409583184 -0500
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_01"
 
     ; CAUTION!! ObjectGroup00 labels MUST appear at the
     ; address specified by the predefined constants!  I can't
@@ -23,7 +28,7 @@
 
     ; Object group $00 (i.e. objects starting at ID $00) State 1 jump table
 
-    .base ObjectGroup_InitJumpTable  ; <-- help enforce this table *here*
+.assert * = ObjectGroup_InitJumpTable, error, "ObjectGroup_InitJumpTable must be at $A000"
 ObjectGroup00_InitJumpTable:
     .word ObjInit_DoNothing ; Object $00
     .word ObjInit_Obj01 ; Object $01
@@ -65,7 +70,7 @@ ObjectGroup00_InitJumpTable:
 
     ; Object group $00 (i.e. objects starting at ID $00) State 2 jump table
 
-    .base ObjectGroup_NormalJumpTable    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_NormalJumpTable, error, "ObjectGroup_NormalJumpTable must be at $A048"
 ObjectGroup00_NormalJumpTable:
     .word ObjNorm_DoNothing ; Object $00
     .word ObjNorm_Obj01 ; Object $01
@@ -108,7 +113,7 @@ ObjectGroup00_NormalJumpTable:
     ; Object group $00 (i.e. objects starting at ID $00) Collision routine jump table (if calling Object_HitTestRespond;
     ; Special values of OCSPECIAL_KILLCHANGETO or OCSPECIAL_HIGHSCORE can be used here instead otherwise.)
 
-    .base ObjectGroup_CollideJumpTable   ; <-- help enforce this table *here*
+.assert * = ObjectGroup_CollideJumpTable, error, "ObjectGroup_CollideJumpTable must be at $A090"
 ObjectGroup00_CollideJumpTable:
     .word ObjHit_DoNothing  ; Object $00
     .word ObjHit_Obj01  ; Object $01
@@ -150,7 +155,7 @@ ObjectGroup00_CollideJumpTable:
 
     ; Object group $00 (i.e. objects starting at ID $00) attribute bits set 1 (OA1_* flags valid here)
 
-    .base ObjectGroup_Attributes ; <-- help enforce this table *here*
+.assert * = ObjectGroup_Attributes, error, "ObjectGroup_Attributes must be at $A0D8"
 ObjectGroup00_Attributes:
     .byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH8  ; Object $00
     .byte OA1_PAL0 | OA1_HEIGHT16 | OA1_WIDTH16 ; Object $01
@@ -199,7 +204,7 @@ ObjectGroup00_Attributes:
     ;   Bits 3: Object uses 16-bit X value (otherwise, Object_XHi will be zeroed)
     ;   Bits 4-7: Pick root tile detection group offset (from Object_TileDetectOffsets)
 
-    .base ObjectGroup_Attributes2    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_Attributes2, error, "ObjectGroup_Attributes2 must be at $A0FC"
 ObjectGroup00_Attributes2:
     .byte OA2_TDOGRP0   ; Object $00
     .byte OA2_TDOGRP1   ; Object $01
@@ -248,7 +253,7 @@ ObjectGroup00_Attributes2:
     ;   Bit 6: The CollideJumpTable entry MAY contain the "special" entry; see CollideJumpTable; also "dies" into "shell" (state 3) (i.e. object "bumps" into shell when hit from beneath)
     ;   Bit 7: If set, object cannot be tail attacked
 
-    .base ObjectGroup_Attributes3    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_Attributes3, error, "ObjectGroup_Attributes3 must be at $A120"
 ObjectGroup00_Attributes3:
     .byte OA3_HALT_HOTFOOTSPECIAL   ; Object $00
     .byte OA3_HALT_JUSTDRAW | OA3_TAILATKIMMUNE ; Object $01
@@ -290,7 +295,7 @@ ObjectGroup00_Attributes3:
 
     ; Object group $00 (i.e. objects starting at ID $00) Pattern Table Select
 
-    .base ObjectGroup_PatTableSel    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_PatTableSel, error, "ObjectGroup_PatTableSel must be at $A144"
 ObjectGroup00_PatTableSel:
     .byte OPTS_NOCHANGE ; Object $00
     .byte OPTS_SETPT5 | $48 ; Object $01
@@ -332,7 +337,7 @@ ObjectGroup00_PatTableSel:
 
     ; Object group $00 (i.e. objects starting at ID $00) "Kill Action"
 
-    .base ObjectGroup_KillAction ; <-- help enforce this table *here*
+.assert * = ObjectGroup_KillAction, error, "ObjectGroup_KillAction must be at $A168"
 ObjectGroup00_KillAction:
     .byte KILLACT_STANDARD  ; Object $00
     .byte KILLACT_STANDARD  ; Object $01
@@ -376,7 +381,7 @@ ObjectGroup00_KillAction:
     ; These are used for all states except "normal"
 
 
-    .base ObjectGroup_PatternStarts  ; <-- help enforce this table *here*
+.assert * = ObjectGroup_PatternStarts, error, "ObjectGroup_PatternStarts must be at $A18C"
 ObjectGroup00_PatternStarts:
     ; Index by object group relative index (ObjGroupRel_Idx)
     .byte ObjP00 - ObjectGroup00_PatternSets, ObjP01 - ObjectGroup00_PatternSets, ObjP02 - ObjectGroup00_PatternSets, ObjP03 - ObjectGroup00_PatternSets
@@ -400,7 +405,7 @@ ObjectGroup00_PatternStarts:
     ; valid JMP $xxxx instruction to go to an alternate giant shell
     ; drawing routine (since otherwise default code is used)
 
-    .base ObjectGroup_PatternSets    ; <-- help enforce this table *here*
+.assert * = ObjectGroup_PatternSets, error, "ObjectGroup_PatternSets must be at $A1B0"
 ObjectGroup00_PatternSets:
     ; (End restricted alignment space)
 ObjP00:
@@ -441,7 +446,7 @@ ObjP23: .byte $55, $55
 ObjP08: .byte $FB, $FB, $FB, $FB, $BB, $B9, $B9, $BB, $BF, $BD
 
 SpinyCheep_XVel:
-    .byte 8, -8
+    .byte 8, <-8
 
 ObjInit_SpinyCheep:
     INC Objects_InWater,X    ; Set object as in-water
@@ -465,8 +470,8 @@ ObjInit_SpinyCheep:
     RTS      ; Return
 
     ; Y velocity acceleration and limits based on direction
-SpinyCheep_YVelAccel:   .byte $01, -$01
-SpinyCheep_YVelMax: .byte $08, -$08
+SpinyCheep_YVelAccel:   .byte $01, <-$01
+SpinyCheep_YVelMax: .byte $08, <-$08
 
 ObjNorm_SpinyCheep:
     LDA Player_HaltGame
@@ -573,7 +578,7 @@ PRG001_A292:
     LDA Player_XVel
     BPL PRG001_A2AE  ; If object's X Velocity >= 0 (still or moving rightward), jump to PRG001_A2AE
 
-    LDY #-$0f    ; Y = -$F (X velocity)
+    LDY #<-$0f    ; Y = <-$F (X velocity)
 
 PRG001_A2AE:
     STY Objects_XVel,X ; Set X velocity appropriately
@@ -782,10 +787,10 @@ ObjInit_Obj04:
     BNE PRG001_A3B6  ; If screen last moved left/down, jump to PRG001_A3B6
 
     STA Objects_FlipBits,X   ; Force left/right flag to $00 (Player is to the left of object)
-    LDY #-8     ; Y = -8
+    LDY #<-8     ; Y = <-8
 
 PRG001_A3B6:
-    STY Objects_XVel,X  ; Set object X velocity to 8 or -8 as appropriate
+    STY Objects_XVel,X  ; Set object X velocity to 8 or <-8 as appropriate
     RTS      ; Return
 
 
@@ -831,10 +836,10 @@ ObjInit_Obj05:
     BNE PRG001_A3EE  ; If screen last moved left/down, jump to PRG001_A3B6
 
     STA Objects_FlipBits,X   ; Force left/right flag to $00 (Player is to the left of object)
-    LDY #-8     ; Y = -8
+    LDY #<-8     ; Y = <-8
 
 PRG001_A3EE:
-    STY Objects_XVel,X  ; Set object X velocity to 8 or -8 as appropriate
+    STY Objects_XVel,X  ; Set object X velocity to 8 or <-8 as appropriate
     RTS      ; Return
 
 
@@ -893,7 +898,7 @@ PRG001_A43C:
 
 PRG001_A43F:
     ; Object "jumps"
-    LDA #-$20
+    LDA #<-$20
     STA Objects_YVel,X
 
     JMP PRG001_A455  ; Jump to PRG001_A455
@@ -955,7 +960,7 @@ PRG001_A478:
     STA Objects_Timer2,X
 
 PRG001_A48F:
-    LDA #-$40
+    LDA #<-$40
     STA Player_YVel ; Bounce Player
 
     ; Bounce Player in direction he's facing
@@ -963,7 +968,7 @@ PRG001_A48F:
     LDA Player_XVel
     BPL PRG001_A49B
 
-    LDY #-$10
+    LDY #<-$10
 
 PRG001_A49B:
     STY Player_XVel
@@ -1031,7 +1036,7 @@ Bounce_TileReplacements:
     .byte CHNGTILE_PIPEJCT
 
     ; Power-up X or Y velocity upon emerging from the bounce block
-Bouncer_PUpVel: .byte $00, -$40, -$40, -$30, -$20, -$10, $00, $10, $20, $30, $40
+Bouncer_PUpVel: .byte $00, <-$40, <-$40, <-$30, <-$20, <-$10, $00, $10, $20, $30, $40
 
 
 ObjNorm_BounceDU:
@@ -1083,14 +1088,14 @@ PRG001_A527:
     LDA Objects_Var2,X
     BNE PRG001_A56E  ; If Var 2 <> 0, jump to PRG001_A56E (RTS)
 
-    LDA #-$38
+    LDA #<-$38
     STA Player_YVel     ; Set Player bounce
     STA Player_mGoomba
 
     LDA Objects_Timer2,X
     BEQ PRG001_A56E  ; If timer 2 expired, jump to PRG001_A56E (RTS)
 
-    LDA #-$70
+    LDA #<-$70
     STA Player_YVel    ; Larger Player bounce
 
     LDA Objects_Var1,X
@@ -1158,7 +1163,7 @@ PRG001_A56F:
     BEQ PRG001_A5AA  ; If var2 = 0, jump to PRG001_A5AA
 
     DEC Temp_Var1   ; Temp_Var1-- (Y Hi)
-    LDA #-1      ; A = -1
+    LDA #<-1      ; A = <-1
 
 PRG001_A5AA:
     LDY Temp_Var2   ; Restore 'Y'
@@ -1369,8 +1374,8 @@ ObjNorm_Anchor:
     CMP #$03
     BNE PRG001_A6A3     ; If Level_AirshipCtl <> 3 (enter airship), jump to PRG001_A6A3
 
-    LDA #-$0C
-    STA Objects_YVel,X     ; Y velocity = -$0C
+    LDA #<-$0C
+    STA Objects_YVel,X     ; Y velocity = <-$0C
 
     JSR Object_ApplyYVel    ; Apply Y velocity
 
@@ -1505,7 +1510,7 @@ PRG001_A746:
     LDA Objects_SpriteY,X
     SEC
     SBC Player_SpriteY
-    CMP #-$6
+    CMP #<-$6
     BGS PRG001_A757
 
     LDA #$01
@@ -1531,7 +1536,7 @@ PRG001_A761:
 PRG001_A76C:
     BPL PRG001_A77C  ; If the velocity is not negative, jump to PRG001_A77C
 
-    LDY #-$03    ; Y = -3
+    LDY #<-$03    ; Y = <-3
 
     ; Set Object's X velocity to Player's X velocity
     LDA Player_XVel
@@ -1595,7 +1600,7 @@ ObjInit_StarOrSuit:
     LDY #$10
     LDA Player_BounceDir
     BEQ PRG001_A7BF
-    LDY #-$38
+    LDY #<-$38
 
     ; Delay until rise
     LDA #$3d
@@ -1637,7 +1642,7 @@ PRG001_A7E0:
     AND #$04
     BEQ PRG001_A7F1  ; If star hasn't touched the ground, jump to PRG001_A7F1
 
-    LDA #-$40
+    LDA #<-$40
     STA Objects_YVel,X ; Star bounce off ground!
 
 PRG001_A7F1:
@@ -1714,7 +1719,7 @@ ObjInit_PUpMush:
 
     JSR Mushroom_SetXVel     ; Set's X velocity appropriately by Player's
 
-    LDY #-$38
+    LDY #<-$38
     JSR Mushroom_SetUpVel    ; Set vertical velocity and mid air flag
     JMP PRG001_A859     ; Jump to PRG001_A859
 
@@ -1745,7 +1750,7 @@ Mushroom_SetXVel:
     LDA Player_X
     AND #$10     ; determine if Player is on even/odd tile
     BNE PRG001_A86E  ; Jump to PRG001_A86E if odd
-    LDY #-$10    ; Otherwise, Y = -$10
+    LDY #<-$10    ; Otherwise, Y = <-$10
 PRG001_A86E:
     STY Objects_XVel,X  ; Set X velocity appropriately
     RTS      ; Return
@@ -1953,7 +1958,7 @@ PowerUp_BounceXVel:
 
     LDA Player_MushFall
     BNE PRG001_A963  ; If falling to right, jump to PRG001_A963
-    LDY #-$10    ; Otherwise, Y = -$10
+    LDY #<-$10    ; Otherwise, Y = <-$10
 PRG001_A963:
     STY Objects_XVel,X  ; Set X velocity appropriately
 
@@ -1994,8 +1999,8 @@ PRG001_A97C:
 
     ; Hit the blockbump tile... (i.e. this kills an enemy who was unlucky enough to be on a bumped block)
 
-    LDA #-$30
-    STA Objects_YVel,X  ; Object Y velocity = -$30
+    LDA #<-$30
+    STA Objects_YVel,X  ; Object Y velocity = <-$30
 
     LDA Objects_X,X
     ASL A
@@ -2172,7 +2177,7 @@ ObjInit_BounceLR:
     LDA Player_BounceDir
     STA Objects_Var2,X   ; Store Player's bounce into var 2
 
-    LDY #-$10    ; Y = -$10 (bounce left)
+    LDY #<-$10    ; Y = <-$10 (bounce left)
 
     CMP #$02
     BEQ PRG001_AA57  ; If bouncing to the left, jump to PRG001_AA57
@@ -2242,12 +2247,12 @@ ObjNorm_BounceLR:
     LDA Objects_XVel,X
     BPL PRG001_AAA8  ; If bouncer is moving to the right, jump to PRG001_AAA8
 
-    LDY #-10     ; Y = -10
+    LDY #<-10     ; Y = <-10
 
 PRG001_AAA8:
-    TYA      ; A = 10 or -10
+    TYA      ; A = 10 or <-10
 
-    ; SpriteX += 10 or -10
+    ; SpriteX += 10 or <-10
     CLC
     ADC Objects_SpriteX,X
     STA Objects_SpriteX,X
@@ -2348,7 +2353,7 @@ ObjHit_BoundLR:
     CMP Objects_X,X
     BGS PRG001_AB24  ; If Player_X > Objects_X, jump to PRG001_AB24
 
-    LDY #-$10    ; Y = -$10
+    LDY #<-$10    ; Y = <-$10
 
 PRG001_AB24:
     STY Player_XVel ; Set Player's X velocity as appropriate
@@ -2383,13 +2388,13 @@ ObjInit_Obj1C:
     CPY Player_X
     BGS PRG001_AB48  ; If Object's X > Player_X, jump to PRG001_AB48
 
-    JSR Negate   ; A = -$40
+    JSR Negate   ; A = <-$40
 
 PRG001_AB48:
     STA Objects_XVel,X  ; Set X Velocity
 
-    LDA #-$80
-    STA Objects_YVel,X  ; Y Velocity = -$80
+    LDA #<-$80
+    STA Objects_YVel,X  ; Y Velocity = <-$80
 
     LDA #$05
     STA Objects_Timer,X  ; Object's timer = 5
@@ -2455,7 +2460,7 @@ ObjInit_SuperLeaf:
     LDY Player_BounceDir
     BEQ PRG001_ABA9  ; If Player bounce down, jump to PRG001_ABA9
 
-    LDA #-$0d   ; A = -$D (bottom spawn offset)
+    LDA #<-$0d   ; A = <-$D (bottom spawn offset)
 
     DEC Objects_YHi,X
 
@@ -2491,11 +2496,11 @@ PRG001_ABB2:
 PRG001_ABCC:
     RTS      ; Return
 
-Leaf_XVelByOsc: .byte $02, -$02
-Leaf_XVelLimit: .byte $20, -$20
+Leaf_XVelByOsc: .byte $02, <-$02
+Leaf_XVelLimit: .byte $20, <-$20
 
 PRG001_ABD1:
-    .byte $0A, -$0A, $08
+    .byte $0A, <-$0A, $08
 
 ObjNorm_SuperLeaf:
     LDA Objects_Timer,X
@@ -2618,8 +2623,8 @@ Vine_NTHigh:    .byte $20, $28
 
 ObjNorm_Vine:
 
-    ; Vine moves at Y Vel = -$10
-    LDA #-$10
+    ; Vine moves at Y Vel = <-$10
+    LDA #<-$10
     STA Objects_YVel,X
 
     JSR Object_ApplyYVel    ; Apply Y Velocity
@@ -3094,9 +3099,9 @@ Koopaling_JumpChanceMask:
     ; jump heights in the game.
 Koopaling_JumpYVels:
     ;World   1     2     3     4     5     6     7
-    .byte -$30, -$30, -$10, -$30, -$50,  $00, -$50 ; - No hits
-    .byte -$40, -$38, -$20, -$40, -$60,  $00, -$60 ; - 1 hit
-    .byte -$50, -$50, -$50, -$50, -$70,  $00, -$70 ; - 2 hits
+    .byte <-$30, <-$30, <-$10, <-$30, <-$50,  $00, <-$50 ; - No hits
+    .byte <-$40, <-$38, <-$20, <-$40, <-$60,  $00, <-$60 ; - 1 hit
+    .byte <-$50, <-$50, <-$50, <-$50, <-$70,  $00, <-$70 ; - 2 hits
 
 
 ObjNorm_Koopaling:
@@ -3166,8 +3171,8 @@ PRG001_AF02:
 PRG001_AF20:
     JSR Object_ApplyXVel     ; Apply X velocity
 
-    LDA #-$60
-    STA Objects_YVel,X  ; Y Velocity = -$60 (fly up and out!)
+    LDA #<-$60
+    STA Objects_YVel,X  ; Y Velocity = <-$60 (fly up and out!)
     JSR Object_ApplyYVel     ; Apply Y velocity
 
 PRG001_AF2A:
@@ -3196,8 +3201,8 @@ PRG001_AF35:
     LDA #$20
     STA Player_VibeDisable  ; "Vibrationally disable" Player!
 
-    LDA #-$10
-    STA Player_YVel    ; Player Y velocity = -$10 (bounce the Player a bit)
+    LDA #<-$10
+    STA Player_YVel    ; Player Y velocity = <-$10 (bounce the Player a bit)
 
     ; Player_Y/Hi -= 1
     DEC Player_Y
@@ -3248,7 +3253,7 @@ PRG001_AF7D:
     STA Objects_XVel,X
 
     ; Set Y velocity for jump
-    LDA #-$48
+    LDA #<-$48
     STA Objects_YVel,X
 
 PRG001_AF8F:
@@ -3299,7 +3304,7 @@ PRG001_AFAB:
     LDY #$10
     ASL A       ; If $40, now $80, thus BMI
     BMI PRG001_AFC3
-    LDY #-$10
+    LDY #<-$10
 
 PRG001_AFC3:
     STY Objects_XVel,X  ; Set proper X velocity towards Player!
@@ -3395,7 +3400,7 @@ Koopaling_DieByFire:
     JMP PRG001_B17B  ; Jump to PRG001_B17B (force third and final hit!)
 
 PRG001_B02C:
-    .byte -$0E, $1E
+    .byte <-$0E, $1E
 
 PRG001_B02E:
 
@@ -3409,7 +3414,7 @@ PRG001_B02E:
     TAY      ; Y = 0 or 1
 
     LDA PRG001_B02C,Y
-    STA Temp_Var1   ; Temp_Var1 = -$0E or $1E
+    STA Temp_Var1   ; Temp_Var1 = <-$0E or $1E
 
     ; Find an empty special object slot -> 'Y' OR if none available, do not return here!
     JSR SpecialObj_FindEmptyAbort
@@ -3669,7 +3674,7 @@ ObjHit_Koopaling:
     LDA #$30     ; A = $30
     BCS PRG001_B154  ; If carry set from Counter_1 (i.e. every other tick), jump to PRG001_B154
 
-    LDA #-$30    ; A = -$30 instead
+    LDA #<-$30    ; A = <-$30 instead
 
 PRG001_B154:
     STA Player_XVel ; Set Player's rebound velocity
@@ -3691,7 +3696,7 @@ PRG001_B158:
 PRG001_B160:
 
     ; Bounce Player off Koopaling!
-    LDA #-$30
+    LDA #<-$30
     STA Player_YVel
 
     LDA Objects_Timer2,X
@@ -4401,7 +4406,7 @@ PRG001_B53D:
 
     RTS      ; Return
 
-PRG001_B556:    .byte -$40, -$2B, -$37, -$2D, -$21
+PRG001_B556:    .byte <-$40, <-$2B, <-$37, <-$2D, <-$21
 
 KDefeat_MoveClouds:
 
@@ -4660,8 +4665,8 @@ PRG001_B668:
     RTS      ; Return
 
 Lemmy_XLimits:      .byte 208, 32   ; Lemmy's X coordinate limits (does not take "X Hi" into account)
-Lemmy_XVelLimits:   .byte $18, -$18 ; Lemmy's X velocity limits
-Lemmy_XVelAccel:    .byte 1, -1 ; Lemmy's X velocity acceleration
+Lemmy_XVelLimits:   .byte $18, <-$18 ; Lemmy's X velocity limits
+Lemmy_XVelAccel:    .byte 1, <-1 ; Lemmy's X velocity acceleration
 
     ; Converts the "0 if Player is to the right of object, 1 if to the left"
     ; to an appropriate horizontal flip
@@ -4892,7 +4897,7 @@ PRG001_B799:
 
     ; Set X velocity of Lemmy ball
 LemmyBall_XVel:
-    .byte -8, 8
+    .byte <-8, 8
 
 Lemmy_SpawnBall:
 
@@ -4954,7 +4959,7 @@ PRG001_B7A7:
 
 
     ; Wendy's ring thing X velocity (by facing direction)
-Wendy_RingXVel: .byte $10, -$10
+Wendy_RingXVel: .byte $10, <-$10
 
 PRG001_B7EC:
     ; World 3, Wendy ...
@@ -4973,8 +4978,8 @@ PRG001_B7EC:
     LDA Objects_YHi,X
     STA Objects_YHi,Y
 
-    ; Set Y velocity to -$10
-    LDA #-$10
+    ; Set Y velocity to <-$10
+    LDA #<-$10
     STA Objects_YVel,Y
 
     STY Temp_Var1   ; Save 'Y'
@@ -5021,7 +5026,7 @@ ObjInit_Bowser:
 
 
     ; X Velocity applied to Player when bouncing off Bowser's head
-Bowser_HeadBounceXVel:  .byte $10, -$10
+Bowser_HeadBounceXVel:  .byte $10, <-$10
 
 ObjNorm_Bowser:
 
@@ -5064,7 +5069,7 @@ PRG001_B8AB:
     BMI PRG001_B8D3  ; If Player is moving upward, jump to PRG001_B8D3
 
     ; Player bounces off Bowser's head!
-    LDA #-$30
+    LDA #<-$30
     STA Player_YVel
 
     JSR Bowser_CalcPlayersSide   ; Calculate the side of his head Player bounced off of
@@ -5274,7 +5279,7 @@ PRG001_B9BF:
     STA Objects_Var4,X
 
     ; Bowser jump!
-    LDA #-$60
+    LDA #<-$60
     STA Objects_YVel,X
 
     JSR Bowser_CalcPlayersSide
@@ -5308,7 +5313,7 @@ PRG001_B9F2:
 
 PRG001_B9F3:
     ; Little hop
-    LDA #-$10
+    LDA #<-$10
     STA Objects_YVel,X
 
     RTS      ; Return
@@ -5351,8 +5356,8 @@ PRG001_BA17:
     LDA Objects_YVel,X
     BPL PRG001_BA1F  ; If Bowser is not moving upward, jump to PRG001_BA1F
 
-    CMP #-$20
-    BLT PRG001_BA4B  ; If Bowser is moving upward faster than -$20, jump to PRG001_BA4B
+    CMP #<-$20
+    BLT PRG001_BA4B  ; If Bowser is moving upward faster than <-$20, jump to PRG001_BA4B
 
 PRG001_BA1F:
 
@@ -5385,7 +5390,7 @@ PRG001_BA1F:
     STA Objects_TargetingXVal,X
 
     ; Bowser jump!
-    LDA #-$20
+    LDA #<-$20
     STA Objects_YVel,X
 
     ; Stop Bowser's horizontal movement
@@ -5497,7 +5502,7 @@ PRG001_BAB6:
 
     JSR Object_HitGround     ; Align to floor
 
-PRG001_BAC2;
+PRG001_BAC2:
     LDA Objects_Timer,X
     BEQ PRG001_BACD     ; If timer expired, jump to PRG001_BACD
 
@@ -5603,8 +5608,8 @@ PRG001_BB46:
     RTS      ; Return
 
     ; Bowser's fireball X velocity and offset by direction
-Bowser_FireballXVel:    .byte -$10, $10
-Bowser_FireballXOff:    .byte -$08, $18
+Bowser_FireballXVel:    .byte <-$10, $10
+Bowser_FireballXOff:    .byte <-$08, $18
 
 PRG001_BB4B:    .byte $00, $08, $10, $18, $08, $00, $00, $10
 
@@ -5887,7 +5892,7 @@ PRG001_BC6D:
     STA BrickBust_HEn
 
     ; Brick bust Y velocity
-    LDA #-$06
+    LDA #<-$06
     STA BrickBust_YVel
 
     RTS      ; Return
@@ -6156,8 +6161,8 @@ PRG001_BE6F:
     LDA #OBJSTATE_NORMAL
     STA Objects_State,X
 
-    ; Bowser got killed by weapon, set Bowser's Y velocity to -$30
-    LDA #-$30
+    ; Bowser got killed by weapon, set Bowser's Y velocity to <-$30
+    LDA #<-$30
     STA Objects_YVel,X
 
 PRG001_BE7F:
@@ -6239,7 +6244,7 @@ PRG001_BEBD:
     BNE PRG001_BEDE     ; If Player is mid-air, jump to PRG001_BEDE
 
     ; Bounce Player if he's on the ground
-    LDA #-$40
+    LDA #<-$40
     STA Player_YVel
 
     ; Mark Player as mid-air

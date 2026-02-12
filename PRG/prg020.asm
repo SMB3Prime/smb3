@@ -11,6 +11,15 @@
 ; This source file last updated: 2012-01-04 18:56:57.490816573 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_20"
+
+.export LeveLoad_FixedSizeGen_TS9, LevelLoad_TS9, LoadLevel_Generator_TS9, Tile_Attributes_TS9, Tile_Layout_TS9
+.export Unused8_EndL, W201L, W202_ExitL, W203L, W204L, W205L, W20FL, W2HBA, W2PYL, W702L, W709L
+
 Tile_Layout_TS9:
     ; This defines the individual 8x8 blocks used to construct one of the tiles
     ; Referenced by Address_Per_Tileset, addressed by Level_Tileset
@@ -2291,7 +2300,7 @@ PRG020_AE2F:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 LL_CannonPlatform:
     .byte TILE9_CANNONBLOCK, TILEA_WOODBLOCK, TILE9_CANNONBLOCK
-LL_CannonPlatform_End
+LL_CannonPlatform_End:
 
 LoadLevel_CannonPlatform:
     LDY TileAddr_Off ; Y = TileAddr_Off

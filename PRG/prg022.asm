@@ -11,6 +11,25 @@
 ; This source file last updated: 2012-01-05 18:09:49.828384346 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_22"
+
+.export Background_Tiles, BonusGameBox_SpriteYs_End, BonusGame_Do, BonusUNKTALL_Tiles_End, Bonus_InstBoxBot
+.export Bonus_InstBoxLine1, Bonus_InstBoxLine2, Bonus_InstBoxLine3, Bonus_InstBoxTop, Bonus_LayoutData
+.export Bonus_Return2_SetMapPos, Card_InitGame, HostHammerBro_SpriteYs_End, HostToad_SpriteYs_End
+.export HostTroopa_SpriteYs_End, LeveLoad_FixedSizeGen_TS151617, LevelLoad_TS15_TS16_TS17
+.export LoadLevel_Generator_TS151617, NSpade_DoGame, PRG022_C51E, PlayerSuit_ToIndex_End, QBoxBlue_Tiles_End
+.export QBoxOrange_Tiles_End, Roulette_DrawBorderSprites, Roulette_DrawShapes, Tile_Layout_TS15_TS16_TS17
+.export UpdSel_Roulette, Video_NSpadeBG, Video_RoulBordAttr
+.export BonusGameBox_SpriteXs, BonusGameBox_SpriteYs, BonusUNKTALL_Tiles, Draw_KTPrizeGameBox
+.export HostHammerBro_Draw, HostHammerBro_DrawSprites, HostHammerBro_SpriteXs, HostHammerBro_SpriteYs
+.export HostToad_Draw, HostToad_DrawSprites, HostToad_SpriteXs, HostToad_SpriteYs, HostTroopa_Draw
+.export HostTroopa_DrawSprites, HostTroopa_DrawWithGameBits, HostTroopa_SpriteXs, HostTroopa_SpriteYs
+.export PlayerSuit_TileBaseIndex, PlayerSuit_ToIndex, Player_BonusTiles_Big, Player_BonusTiles_Raccoon
+.export Player_BonusTiles_Small, QBoxBlue_Tiles, QBoxOrange_Tiles
 
 ;---------------------------------------------------------------------------
 ; THE (LOST) BONUS GAMES!
@@ -553,7 +572,7 @@ PlayerSuit_ToIndex:
     .byte PLAYERSUIT_BIG        ; 0 (Default when all else fails)
     .byte PLAYERSUIT_RACCOON    ; 1
     .byte PLAYERSUIT_SMALL      ; 2
-PlayerSuit_ToIndex_End
+PlayerSuit_ToIndex_End:
 
 PlayerSuit_TileBaseIndex:
     .byte (Player_BonusTiles_Big - Player_BonusTiles_Big)
@@ -624,7 +643,7 @@ BonusUNKTALL_Tiles:
     .byte TILE15_UNKTALL_R1L,   TILE15_UNKTALL_R1R
     .byte TILE15_UNKTALL_R2L,   TILE15_UNKTALL_R2R
     .byte TILE15_UNKTALL_LL,    TILE15_UNKTALL_LR
-BonusUNKTALL_Tiles_End
+BonusUNKTALL_Tiles_End:
 
 LoadLevel_UNKTALL:
     LDX #$00        ; X = 0
@@ -724,7 +743,7 @@ PRG022_C618:
 
 QBoxOrange_Tiles:
     .byte $C9, $CA, $CB, $CC
-QBoxOrange_Tiles_End
+QBoxOrange_Tiles_End:
 
 LoadLevel_QBoxOrange:
     LDX #$00     ; X = 0
@@ -761,7 +780,7 @@ PRG022_C633:
 
 QBoxBlue_Tiles:
     .byte $87, $88, $89, $8A
-QBoxBlue_Tiles_End
+QBoxBlue_Tiles_End:
 
 
 LoadLevel_QBoxBlue:
@@ -934,7 +953,7 @@ HostHammerBro_Draw:
 
 HostToad_SpriteYs:
     .byte $60, $60, $60, $60, $70, $70, $70, $70, $80, $80, $80
-HostToad_SpriteYs_End
+HostToad_SpriteYs_End:
 
 HostToad_SpriteXs:
     .byte $C0, $C8, $D0, $D8, $C0, $C8, $D0, $D8, $C0, $C8, $D0
@@ -984,7 +1003,7 @@ PRG022_C727:
 
 HostTroopa_SpriteYs:
     .byte $60, $60, $60, $70, $70, $70, $70, $80, $80, $80
-HostTroopa_SpriteYs_End
+HostTroopa_SpriteYs_End:
 
 HostTroopa_SpriteXs:
     .byte $C0, $C8, $D0, $C0, $C8, $D0, $D8, $C8, $D0, $D8
@@ -1034,7 +1053,7 @@ PRG022_C765:
 
 HostHammerBro_SpriteYs:
     .byte $60, $60, $60, $70, $70, $70, $70, $80, $80, $80, $80
-HostHammerBro_SpriteYs_End
+HostHammerBro_SpriteYs_End:
 
 HostHammerBro_SpriteXs:
     .byte $C0, $C8, $D0, $C0, $C8, $D0, $D8, $C0, $C8, $D0, $D8
@@ -1082,7 +1101,7 @@ PRG022_C7A5:
 
 BonusGameBox_SpriteYs:
     .byte $70, $70, $70, $70, $80, $80, $80, $80
-BonusGameBox_SpriteYs_End
+BonusGameBox_SpriteYs_End:
 
 BonusGameBox_SpriteXs:
     .byte $70, $78, $80, $88, $70, $78, $80, $88
@@ -2146,8 +2165,8 @@ Bonus_DieFlyAway:
 
 PRG022_CD03:
     LDA BonusDie_YVel
-    CMP #-$80
-    BEQ PRG022_CD0E  ; If BonusDie_YVel = -$80, jump to PRG022_CD0E
+    CMP #<-$80
+    BEQ PRG022_CD0E  ; If BonusDie_YVel = <-$80, jump to PRG022_CD0E
 
     ; BonusDie_YVel -= $08
     SEC
@@ -2278,7 +2297,7 @@ PRG022_CD7C:
     STA Bonus_CoinsY,Y
     STA Bonus_CoinsX,Y
 
-    LDX #-$10    ; X = -$10
+    LDX #<-$10    ; X = <-$10
 
     LDA RandomN,Y   ; Get random value
     ASL A       ; Multiply by 2
@@ -2288,7 +2307,7 @@ PRG022_CD7C:
     LDX #$00    ; Otherwise, X = $00
 PRG022_CD8F:
 
-    ; Temp_Var1 = -$10 or $00
+    ; Temp_Var1 = <-$10 or $00
     TXA
     STA Temp_Var1
 
@@ -2299,7 +2318,7 @@ PRG022_CD8F:
 
     LDA RandomN,Y
     AND #$07        ; Random 0-7
-    ORA #-$40       ; Base -$40
+    ORA #<-$40       ; Base <-$40
     STA Bonus_CoinsYVel,Y   ; -> Bonus_CoinsYVel
 
     DEY      ; Y--
@@ -2527,7 +2546,7 @@ PRG022_CE83:
 
     TYA
     SEC
-    SBC #12     ; -12 (3 sprites prior)
+    SBC #12     ; <-12 (3 sprites prior)
     TAY
 
     BPL PRG022_CE83  ; While Y >= 0, loop!
@@ -2980,7 +2999,7 @@ PRG022_D151:
     ; Roulette_Speed += 4
     LDA Roulette_Speed,X
     CLC
-    ADC #$04        ; Really +2, but it hits the -2 after this
+    ADC #$04        ; Really +2, but it hits the <-2 after this
     STA Roulette_Speed,X
 
 PRG022_D15F:
@@ -3118,7 +3137,7 @@ PRG022_D20B:
     AND #$04
     BNE PRG022_D213  ; 4 ticks on, 4 ticks off; jump to PRG022_D213
 
-    LDY #-$10    ; Y = -$10
+    LDY #<-$10    ; Y = <-$10
 
 PRG022_D213:
 
@@ -3791,7 +3810,7 @@ Card_InitialSet:
     .byte CARD_MUSHROOM,    CARD_FLOWER,    CARD_1UP,   CARD_MUSHROOM,  CARD_10COIN,    CARD_STAR
     .byte CARD_20COIN,  CARD_STAR,  CARD_MUSHROOM,  CARD_10COIN,    CARD_1UP,   CARD_FLOWER
     .byte CARD_20COIN,  CARD_FLOWER,    CARD_STAR,  CARD_MUSHROOM,  CARD_FLOWER,    CARD_STAR
-Card_InitialSet_End
+Card_InitialSet_End:
 
     ; N-Spade cards VRAM High address
 Card_VRAMHi:
@@ -5078,10 +5097,10 @@ CardBase_BufCmds:
 
     DBYT $0000 ; Will be patched
     .byte $04, $64, $FE, $FE, $65
-CardBase_BufCmds_End
+CardBase_BufCmds_End:
 
     ; Blacks out a card
-CardBlackout_BufCmds
+CardBlackout_BufCmds:
     DBYT $0000 ; Will be patched
     .byte $04, $FF, $FF, $FF, $FF
 
@@ -5096,7 +5115,7 @@ CardBlackout_BufCmds
 
     ; Terminator
     .byte $00
-CardBlackout_BufCmds_End
+CardBlackout_BufCmds_End:
 
     ; NSpade Card unflipped backside
 CardBack_BufCmds:
@@ -5111,7 +5130,7 @@ CardBack_BufCmds:
 
     DBYT $0000 ; Will be patched
     .byte $04, $66, $FD, $FD, $67
-CardBack_BufCmds_End
+CardBack_BufCmds_End:
 
     ; NSpade Game's Candystripe background
 Video_NSpadeBG:

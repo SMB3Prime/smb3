@@ -11,6 +11,19 @@
 ; This source file last updated: 2012-03-11 19:37:01.275664050 -0500
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_30"
+
+.export Bonus_Prize1, Clear_RAM_thru_ZeroPage, EndLevelCard_PalData, GraphicsBuf_Prep_And_WaitVSync, IntReset_Part2
+.export LevelLoad, Level_RecordBlockHit, LoadLevel_Set_TileMemAddr, Map_Calc_NT2Addr_By_XY, Map_Y_Starts, PRG030_845A
+.export PRG030_897B, PRG030_9E6C, Scroll_Update, Scroll_Update_Ranges, TileLayout_ByTileset, TileLayout_GetBaseAddr
+.export Tile_Mem_Addr, Tile_Mem_AddrVH, Tile_Mem_AddrVL, Tile_Mem_ClearA, Tile_Mem_ClearB
+.export IntIRQ_32PixelPartition_Part2, IntIRQ_32PixelPartition_Part5, LevelJct_GetVScreenH, LevelJct_GetVScreenH2
+.export PRG030_SUB_9F40, PRG030_SUB_9F50, Player_GetTileAndSlope_Normal, Player_GetTileV, Randomize
+
     ; STANDARD HORIZONTAL SCREEN
 
 Tile_Mem_Addr:
@@ -117,49 +130,49 @@ Video_Upd_Table: ; $803E
 .macro StatusBar _1
 
     ; Sync next three with PRG026 Flip_TopBarCards
-    DBYT _1 + $00
+    DBYT (_1 + $00)
     .byte $02, $FC, $A0     ; Upper left corner
 
-    DBYT _1 + $02
+    DBYT (_1 + $02)
     .byte VU_REPEAT | $12, $A1  ; Bar across the top
 
-    DBYT _1 + $14
+    DBYT (_1 + $14)
     .byte $0C, $A2, $A0, $A1, $A1, $A3, $A1, $A1, $A3, $A1, $A1, $A2, $FC   ; top of card slots
 
     ; Sync this with PRG026 Flip_MidTStatCards
-    DBYT _1 + $20
+    DBYT (_1 + $20)
     .byte $20, $FC, $A6, $70, $71, $72, $73, $FE, $FE, $EF, $EF, $EF, $EF, $EF, $EF, $3C    ; |WORLD  >>>>>>[P] $  | |  | |  | |  | |
     .byte $3D, $FE, $EC, $F0, $F0, $A7, $A6, $FE, $FE, $AA, $FE, $FE, $AA, $FE, $FE, $A7, $FC
     ; Discrepency --------^  (Pattern is ... $FE, $F0 ... in PRG026 status bar graphics)
 
     ; Sync this with PRG026 Flip_MidBStatCards
-    DBYT _1 + $40
+    DBYT (_1 + $40)
     ; Discrepency --------v  (Pattern is ... $FE, $FE ... in PRG030 status bar)  Unimportant; inserts <M> which is replaced anyway
     .byte $20, $FC, $A6, $FE, $FE, $FB, $FE, $F3, $FE, $F0, $F0, $F0, $F0, $F0, $F0, $F0    ; [M/L]x  000000 c000| etc.
     .byte $FE, $ED, $F4, $F0, $F0, $A7, $A6, $FE, $FE, $AA, $FE, $FE, $AA, $FE, $FE, $A7, $FC
     ; Discrepency --------^  (Pattern is ... $F4, $F0 ... in PRG030 status bar graphics)
 
     ; Sync next three with PRG026 Flip_BottomBarCards
-    DBYT _1 + $60
+    DBYT (_1 + $60)
     .byte $02, $FC, $A8 ; Lower corner
 
-    DBYT _1 + $62
+    DBYT (_1 + $62)
     .byte VU_REPEAT | $12, $A4  ; Bottom bar
 
-    DBYT _1 + $74
+    DBYT (_1 + $74)
     .byte $0C, $A5, $A8, $A4, $A4, $A9, $A4, $A4, $A9, $A4, $A4, $A5, $FC   ; lower corner and card bottoms
 
     ; End PRG026 sync
 
-    DBYT _1 + $80
+    DBYT (_1 + $80)
     .byte VU_REPEAT | $20, $FC  ; black space
 
-    DBYT _1 + $A0
+    DBYT (_1 + $A0)
     .byte VU_REPEAT | $20, $FC  ; black space
 
     ; Terminator
     .byte $00
-    .endm
+    .endmacro
 
     ; Typical status bar (vertical level)
 Video_DoStatusBarV:
@@ -406,7 +419,7 @@ PlantInfest_ACnt_MaxConst:  .byte (PlantInfest_PTPAC_End - PlantInfest_PatTableP
 PlantInfest_PatTablePerACnt:
     .byte $60, $60, $60, $60, $60, $60, $60, $60, $60, $60, $62, $64, $66, $3E, $3E, $3E
     .byte $3E, $3E, $3E, $3E, $3E, $3E, $3E, $66, $64, $62, $06
-PlantInfest_PTPAC_End
+PlantInfest_PTPAC_End:
 
     .byte $34, $36, $38, $3A, $3C
     .byte $3E, $08, $34, $36, $38, $36, $34, $3A, $3E, $3A
@@ -428,7 +441,7 @@ PAUSE_Sprites:
     .byte $58, $F9, $03, $80    ; U
     .byte $58, $FD, $03, $90    ; S
     .byte $58, $FF, $03, $A0    ; E
-PAUSE_Sprites_End
+PAUSE_Sprites_End:
 
     ; The BGM per world (see also World_BGM_Restore in PRG010)
 World_BGM:
@@ -2008,8 +2021,8 @@ PRG030_8CDE:
     LDA #$35
     STA ToadTalk_VL
 
-    ; BonusDie_YVel = -$60
-    LDA #-$60
+    ; BonusDie_YVel = <-$60
+    LDA #<-$60
     STA BonusDie_YVel
 
     ; Set the die to Y = $78, X = $78
@@ -3466,7 +3479,7 @@ PRG030_948F:
     ; "It may have been because of the 2P mode. You can't punish
     ; the other player because one of you sucks bad."
 
-    LDX #-$04   ; <-- BUG!  BAD INDEX!!  (Should be X = 2??)
+    LDX #<-$04   ; <-- BUG!  BAD INDEX!!  (Should be X = 2??)
 PRG030_9491:
     LDY #MAPOBJ_TOTAL-1    ; Y = (MAPOBJ_TOTAL-1) (all Map Objects)
 

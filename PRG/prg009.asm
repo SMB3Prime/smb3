@@ -11,6 +11,42 @@
 ; This source file last updated: 2011-11-18 21:50:36.000000000 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_09"
+
+.export ASM_CoinShip
+.export ASM_UNK12, ASM_UNK4, ASM_UNK8, ASM_UNK9, ASM_W1Airship, ASM_W1CoinHeaven, ASM_W3_Airship, ASM_W4Airship
+.export ASM_W5_Airship, ASM_W6Airship, ASM_W7Airship, ASM_W8Airship, ASM_W8Battleship, ASM_World8Tank1, ASM_World8Tank2
+.export ASM_World_36_14, ASM_World_56, ASM_World_62, ASM_World_67, ASM_World_74, AScroll_Movement, AutoScroll_Do
+.export Vs_2PVsPauseHandler
+
+.export AScroll_Movement
+.export ASM_World_36_14
+.export ASM_W3_Airship
+.export ASM_World_62
+.export ASM_W5_Airship
+.export ASM_UNK4
+.export ASM_W4Airship
+.export ASM_W6Airship
+.export ASM_World_56
+.export ASM_UNK8
+.export ASM_UNK9
+.export ASM_World_67
+.export ASM_W1Airship
+.export ASM_W7Airship
+.export ASM_W8Airship
+.export ASM_W8Battleship
+.export ASM_World_74
+.export ASM_W1CoinHeaven
+.export ASM_CoinShip
+.export ASM_UNK12
+.export ASM_World8Tank1
+.export ASM_World8Tank2
+.export ASM_Terminator
+
 
     ; Number of lives per card combination; mainly to give the 2, 3, 5
 Vs_LivesReward:
@@ -190,11 +226,11 @@ PRG009_A0C2:
     TAX
 
     ; Set left pattern
-    LDA Vs_xUpPattern_L-1,X ; -1 because "0 lives" isn't valid
+    LDA Vs_xUpPattern_L-1,X ; <-1 because "0 lives" isn't valid
     STA Sprite_RAM+$01,Y
 
     ; Set right pattern
-    LDA Vs_xUpPattern_R-1,X ; -1 because "0 lives" isn't valid
+    LDA Vs_xUpPattern_R-1,X ; <-1 because "0 lives" isn't valid
     STA Sprite_RAM+$05,Y
 
     LDX Temp_Var1   ; Restore 'X'
@@ -210,7 +246,7 @@ Vs_PlayerCoinStatCmds:
 
     ; Terminator
     .byte $00
-Vs_PlayerCoinStatCmds_End
+Vs_PlayerCoinStatCmds_End:
 
     ; Base VRAM offset for Mario/Luigi top screen coin status
 Vs_PlayerCoinStatBaseVRAM:
@@ -708,13 +744,13 @@ PRG009_A352:
     ; Random Y velocity
     JSR Vs_Randomize ; Stir up randomness
     AND #$0f
-    ADC #-$58
+    ADC #<-$58
     STA Vs_ObjectYVel,X
 
     ; Random X velocity
     JSR Vs_Randomize ; Stir up randomness
     AND #$1f    ; 0 to $20
-    SBC #$10    ; -$10 to $10
+    SBC #$10    ; <-$10 to $10
     STA Vs_ObjectXVel,X
 
     JSR Vs_PrepareNewObject  ; Setup this new object
@@ -729,7 +765,7 @@ PRG009_A352:
 
     ; Y velocity of stomped card
 Vs_CardStompYVel:
-    .byte -$48, -$48, -$38  ; Mushroom, Flower, Star
+    .byte <-$48, <-$48, <-$38  ; Mushroom, Flower, Star
 
 Vs_PlayerPopCard:
     LDX #$02     ; X = 2 (Relative card index)
@@ -802,10 +838,10 @@ PRG009_A3AD:
 
     ASL A        ; Sets carry if Player is on right half of field
 
-    ; Set card's X velocity to $06 or -$06
+    ; Set card's X velocity to $06 or <-$06
     LDA #$06    ; A = $06 if on left side of field
     BCC PRG009_A3DA  ; If carry clear (on left side of field), jump to PRG009_A3DA
-    LDA #-$06    ; A = -$06 if on right side of field
+    LDA #<-$06    ; A = <-$06 if on right side of field
 PRG009_A3DA:
     STA Vs_ObjectXVel,X
 
@@ -978,7 +1014,7 @@ Vs_WalkCntRate:
 
     ; Sets X velocity after Player hits a wall (only used in bonus games where wall blocking is possible)
 Vs_PlayerBlockXVel:
-    .byte $04, -$04 ; Right, Left
+    .byte $04, <-$04 ; Right, Left
 
     ; Only certain Map_2PVsGame styles even have walls to worry about...
     ; Set value to non-zero (1) to enable wall hits
@@ -1101,7 +1137,7 @@ PRG009_A509:
 
 PRG009_A518:
     SEC
-    SBC #$01     ; Player going too fast, -1 to X Velocity
+    SBC #$01     ; Player going too fast, <-1 to X Velocity
 
 PRG009_A51B:
     JMP PRG009_A543  ; Jump to PRG009_A543 (set Player X velocity)
@@ -1117,11 +1153,11 @@ PRG009_A51E:
     ; Player pushed B...
 
     LDA Vs_PlayerXVel,X
-    CMP #-$17
-    BLS PRG009_A52E  ; If Player X Velocity < -$17, jump to PRG009_A52E
+    CMP #<-$17
+    BLS PRG009_A52E  ; If Player X Velocity < <-$17, jump to PRG009_A52E
 
     SEC
-    SBC #$01     ; Otherwise, -1 to X Velocity
+    SBC #$01     ; Otherwise, <-1 to X Velocity
 
 PRG009_A52E:
     JMP PRG009_A543  ; Jump to PRG009_A543 (set Player X velocity)
@@ -1131,12 +1167,12 @@ PRG009_A531:
     ; Player did not push B...
 
     LDA Vs_PlayerXVel,X
-    CMP #-$0C
-    BEQ PRG009_A543  ; If Player's X velocity = -$0C, jump to PRG009_A543
-    BLS PRG009_A540  ; If Player's X velocity < -$0C, jump to PRG009_A540
+    CMP #<-$0C
+    BEQ PRG009_A543  ; If Player's X velocity = <-$0C, jump to PRG009_A543
+    BLS PRG009_A540  ; If Player's X velocity < <-$0C, jump to PRG009_A540
 
     SEC
-    SBC #$01     ; -1 to X Velocity
+    SBC #$01     ; <-1 to X Velocity
 
     JMP PRG009_A543  ; Jump to PRG009_A543 (set Player X velocity)
 
@@ -1190,7 +1226,7 @@ PRG009_A555:
     CMP #%10000000
     BEQ PRG009_A581 ; If Player hit on left side, jump to PRG009_A581
 
-    LDY #-$08    ; Y = -$08 (Player hit on right side)
+    LDY #<-$08    ; Y = <-$08 (Player hit on right side)
 
 PRG009_A581:
 
@@ -1218,12 +1254,12 @@ PRG009_A58D:
     ORA #SND_PLAYERSWIM
     STA Sound_QPlayer
 
-    LDA #-$38
+    LDA #<-$38
     JMP PRG009_A5CE  ; Jump to PRG009_A5CE (set Player Y Velocity)
 
     ; Table of values that gives Player a different jump height based on movement speed
 Vs_PlayerJumpHeightBySpd:
-    .byte -$42, -$42, -$42, -$42, -$42, -$42, -$42, -$36, -$38, -$3A, -$3C, -$3E, -$40, -$42
+    .byte <-$42, <-$42, <-$42, <-$42, <-$42, <-$42, <-$42, <-$36, <-$38, <-$3A, <-$3C, <-$3E, <-$40, <-$42
 
 PRG009_A5AD:
 
@@ -1280,7 +1316,7 @@ PRG009_A5E7:
     ; Player is moving to the right...
 
     SEC
-    SBC #$01     ; -1 to X Velocity (slow down)
+    SBC #$01     ; <-1 to X Velocity (slow down)
     STA Vs_PlayerXVel,X  ; Update X velocity
 
 PRG009_A5ED:
@@ -1506,7 +1542,7 @@ VsPlayer_Climbing:
     CMP #$08
     LDY #$01     ; Y = 1 (Player is on right half of tile)
     BGE PRG009_A6F6  ; If Player is on right half of tile, jump to PRG009_A6F6
-    LDY #-$01    ; Y = -1 (Player is on left half of tile)
+    LDY #<-$01    ; Y = <-1 (Player is on left half of tile)
 PRG009_A6F6:
     TYA
     CLC
@@ -1691,7 +1727,7 @@ Vs_DetStatLoop:
     .byte $01   ; 3: right wall hit
     .byte $04   ; 4: floor hit
     .byte $04   ; 5: floor hit
-Vs_DetStatLoop_End
+Vs_DetStatLoop_End:
 
 Vs_DetStatLoopUnderHit:
     .byte $00
@@ -1807,8 +1843,8 @@ PRG009_A828:
     LDA #$0e
     STA Vs_PlayerBlkHitCnt,X
 
-    ; Vs_PlayerBlkHitYVel = -$20
-    LDA #-$20
+    ; Vs_PlayerBlkHitYVel = <-$20
+    LDA #<-$20
     STA Vs_PlayerBlkHitYVel,X
 
 PRG009_A865:
@@ -1891,8 +1927,8 @@ PRG009_A8AD:
     ASL A       ; Shift the column up (multiply by 16)
     STA Vs_ObjectsX,X
 
-    ; Kicked block Y Vel = -$40
-    LDA #-$40
+    ; Kicked block Y Vel = <-$40
+    LDA #<-$40
     STA Vs_ObjectYVel,X
 
     LDY #$10     ; Y = $10 (kick to the right)
@@ -1902,7 +1938,7 @@ PRG009_A8AD:
     CMP Vs_PlayerX,X
     BGE PRG009_A8DE  ; If block is to the right of Player, jump to PRG009_A8DE
 
-    LDY #-$10    ; Y = -$10 (kick to the left)
+    LDY #<-$10    ; Y = <-$10 (kick to the left)
 
 PRG009_A8DE:
     LDX Temp_Var1   ; X = object index
@@ -2254,12 +2290,12 @@ PRG009_AA87:
     RTS      ; Return
 
 VsPlayer_BounceOffOtherXVel:
-    .byte $10, -$10, $10, -$10
+    .byte $10, <-$10, $10, <-$10
 
     ; These tables are designed so that they can be index by
     ; Mario or Luigi and values correctly set by situation
 VsPlayer_BounceOffOtherYVel:
-    .byte -$30, $00, -$30
+    .byte <-$30, $00, <-$30
 
 VsPlayer_BounceOffOtherDizzy:
     .byte $00, $12, $00
@@ -2464,16 +2500,16 @@ VsES_SStepAll:      .byte ES_SIDESTEPPER, ES_SIDESTEPPER, ES_SIDESTEPPER, ES_SID
 Vs_SpawnEnemyStartX:        .byte 16, 224
 
     ; Starting X velocity for non-last enemy
-Vs_SpawnEnemyStartXVel:     .byte $06, -$06, $06
+Vs_SpawnEnemyStartXVel:     .byte $06, <-$06, $06
 
     ; Starting X velocity for last enemy (fast!)
-Vs_SpawnEnemyStartXVelFast: .byte $10, -$10, $10
+Vs_SpawnEnemyStartXVelFast: .byte $10, <-$10, $10
 
     ; Fireball starting X
 Vs_HFireballX:      .byte 8, 232
 
     ; Fireball starting X velocity
-Vs_HFireballXVel:   .byte $10, -$10
+Vs_HFireballXVel:   .byte $10, <-$10
 
 
     ; Enemy spawner
@@ -2937,7 +2973,7 @@ PRG009_ADED:
     BMI PRG009_AE0D  ; If card is moving upward, jump to PRG009_AE0D
 
     ; Card bounces!
-    LDA #-$24
+    LDA #<-$24
     STA Vs_ObjectYVel,X
 
 PRG009_AE0D:
@@ -3127,7 +3163,7 @@ Vs_BottomPipeEntranceX: .byte 208, 32
 Vs_BottomPipeLimitX:    .byte 224, 16
 
     ; X velocity for enemy inside pipe
-Vs_EnemyPipeXVel:   .byte $06, -$06
+Vs_EnemyPipeXVel:   .byte $06, <-$06
 
 Vs_EnemyMove:
     LDA Vs_ObjectXVel,X
@@ -3162,7 +3198,7 @@ Vs_FighterFly:
     BNE PRG009_AF40  ; If enemy still hasn't gotten up, jump to PRG009_AF40
 
     ; Enemy hops up!
-    LDA #-$1C
+    LDA #<-$1C
     STA Vs_ObjectYVel,X
 
 PRG009_AF2E:
@@ -3481,7 +3517,7 @@ PRG009_B0B2:
 
 PRG009_B0BB:
     ; Enemy bounce!
-    LDA #-$20
+    LDA #<-$20
     STA Vs_ObjectYVel,X
 
 PRG009_B0C0:
@@ -4041,7 +4077,7 @@ PRG009_B34C:
     RTS      ; Return
 
     ; Kicked off object X velocity
-Vs_ObjectKickedXVel:    .byte -$20, $20
+Vs_ObjectKickedXVel:    .byte <-$20, $20
 
 Vs_ObjectPlayerCollide:
     LDA Vs_PlayerState
@@ -4051,7 +4087,7 @@ Vs_ObjectPlayerCollide:
     CMP #$01
     BNE PRG009_B34C  ; If Mario is not in normal state (Init/Dying), jump to PRG009_B34C (RTS)
 
-PRG009_B35A
+PRG009_B35A:
     LDA Vs_PlayerState+1
     CMP #$03
     BEQ PRG009_B365  ; If Luigi is climbing, jump to PRG009_B365
@@ -4221,7 +4257,7 @@ PRG009_B3FC:
     STA Vs_PlayerState,Y
 
     ; Player moves upward
-    LDA #-$30
+    LDA #<-$30
     STA Vs_PlayerYVel,Y
 
     ; If one of the fireballs got you, jump to PRG009_B43B
@@ -4282,7 +4318,7 @@ PRG009_B460:
     STA Vs_ObjectState,X
 
     ; Kicked object upward
-    LDA #-$20
+    LDA #<-$20
     STA Vs_ObjectYVel,X
 
     ; Player does kicking animation
@@ -4383,7 +4419,7 @@ PRG009_B4DF:
     ; Give card
     LDA Vs_ObjectId,X
     SEC
-    SBC #VSOBJID_MUSHROOMCARD - 1 ; -1 because "0" is none, "1" is Mushroom card, etc.
+    SBC #VSOBJID_MUSHROOMCARD - 1 ; <-1 because "0" is none, "1" is Mushroom card, etc.
     STA Inventory_Cards,Y
 
 PRG009_B4F4:
@@ -4395,9 +4431,9 @@ PRG009_B4F5:
     ; When an object "gets up" from being flipped over, it's a little faster than before!
     ; Different ranges depending on what the previous X velocity was; and for each direction.
 Vs_ObjectGetUpXVel:
-    .byte $0A, -$0A ; old abs X Vel < $0A
-    .byte $0C, -$0C ; old abs X Vel < $0C
-    .byte $10, -$10 ; otherwise
+    .byte $0A, <-$0A ; old abs X Vel < $0A
+    .byte $0C, <-$0C ; old abs X Vel < $0C
+    .byte $10, <-$10 ; otherwise
 
 
 Vs_ObjStateFlippedOver:
@@ -4740,8 +4776,8 @@ PRG009_B6AD:
 PRG009_B6B3:
     RTS      ; Return
 
-Vs_FireballYVelAccel:   .byte -$01, $01
-Vs_FireballYVelLimit:   .byte -$10, $10
+Vs_FireballYVelAccel:   .byte <-$01, $01
+Vs_FireballYVelLimit:   .byte <-$10, $10
 
 Vs_FireballXLimit:
     .byte 232, 8
@@ -5285,7 +5321,7 @@ ASM_CoinShip:       .byte $80
 ASM_UNK12:      .byte $04, $00
 ASM_World8Tank1:    .byte $04, $10, $00
 ASM_World8Tank2:    .byte $04, $10
-ASM_Terminator
+ASM_Terminator:
 
 
     ; How many times to repeat the above command
@@ -5314,7 +5350,7 @@ ASMR_World8Tank2:   .byte $E8, $08
 ASMR_Terminator:    .byte $04
 
     ; Accelerates horizontal or vertical velocity
-AScroll_VelAccel:   .byte $00, $01, -$01, -$01
+AScroll_VelAccel:   .byte $00, $01, <-$01, <-$01
 
     ; "Movement Loops" are perpetual auto scroll movements e.g. for the Airship scroll termination
     ; It just continually feeds movement commands on loop forever (see AScroll_MovementLoop and AScroll_MovementLoopTicks)
@@ -5342,7 +5378,7 @@ ASML_3:     .byte $01, $00, $02, $00
 ASML_4:     .byte $04, $00, $00
 ASML_5:     .byte $04, $00, $00, $02, $00, $01, $00, $01, $00, $02, $00
 ASML_6:     .byte $05, $04, $00, $02, $00, $01, $00, $02, $00, $01, $00, $02, $00, $01
-ASML_Terminator
+ASML_Terminator:
 
     .byte $FF
 
@@ -5355,7 +5391,7 @@ ASMLT_3:    .byte $10, $0E, $10, $0E
 ASMLT_4:    .byte $08, $FF, $68
 ASMLT_5:    .byte $08, $F0, $F4, $10, $66, $10, $76, $10, $66, $10, $95
 ASMLT_6:    .byte $02, $02, $90, $04, $78, $04, $78, $04, $78, $04, $78, $04, $78, $02
-ASMLT_Terminator
+ASMLT_Terminator:
 
     ; Glowing coin palette colors
 AScroll_CoinShipCoinGlowPal:
@@ -5752,8 +5788,8 @@ PRG009_BD57:
     BNE PRG009_BD6A  ; 1:8 ticks proceed, otherwise jump to PRG009_BD6A
 
     LDA Level_AScrlVVel
-    CMP #-$08
-    BEQ PRG009_BD6A  ; If vertical scroll velocity = -$08, jump to PRG009_BD6A
+    CMP #<-$08
+    BEQ PRG009_BD6A  ; If vertical scroll velocity = <-$08, jump to PRG009_BD6A
 
     DEC Level_AScrlVVel  ; Otherwise, accelerate upwards...
 
@@ -5761,9 +5797,9 @@ PRG009_BD6A:
     JMP PRG009_BDC9  ; Jump to PRG009_BDC9
 
 
-ASFloat_VelAccel:   .byte -$01, $01
+ASFloat_VelAccel:   .byte <-$01, $01
 
-AScroll_SpikeCeilVVelLimit: .byte -$08, $08
+AScroll_SpikeCeilVVelLimit: .byte <-$08, $08
 
 AScroll_SpikeCeilVLimits:
     .byte $7C, $EF  ; Spike Ceiling 0 Upper/Lower limit
@@ -5917,7 +5953,7 @@ PRG009_BE2B:
 
     RTS      ; Return
 
-ASFloat_VVelLimit:  .byte -$04, $04
+ASFloat_VVelLimit:  .byte <-$04, $04
 
 
     ; Based on value in Level_AScrlLimitSel (Level_AScrlVar = 0 for left value, 1 for right)
@@ -6019,7 +6055,7 @@ AutoScroll_URDiagonal:
     ; Scroll diagonally
     LDA #$08
     STA Level_AScrlHVel
-    LDA #-$08
+    LDA #<-$08
     STA Level_AScrlVVel
 
     LDA Level_AScrlVVelCarry

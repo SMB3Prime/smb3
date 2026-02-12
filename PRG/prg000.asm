@@ -11,6 +11,35 @@
 ; This source file last updated: 2012-01-29 13:49:44.499306754 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_00"
+
+.export AScrlURDiag_HandleWrap, AScroll_HorizontalInitMove, BlockBump_Init, BrickBust_MoveOver, ConveyorEnable
+.export DoTimeBonus, Fish_FixedYIfAppro, Fish_FixedY_ExceptHitFloor, LevelEvent_DoNothing, Level_ChangeTile_ByTempVars
+.export Level_MinTileUWByQuad, Level_ObjCalcXDiffs, Level_ObjCalcYDiffs, Level_PrepareNewObject, Level_SlopeSetByQuad
+.export MuncherJelectroSet, Negate, NonSlope_LUT_Addr, Obj2Obj_EnByState, ObjHit_DoNothing, ObjInit_DoNothing
+.export ObjNorm_DoNothing, ObjectObject_Intersect, Object_AboutFace, Object_AnySprOffscreen, Object_ApplyXVel
+.export Object_ApplyYVel, Object_ApplyYVel_NoLimit, Object_AttrFlags, Object_BumpBlocks, Object_CalcBoundBox
+.export Object_CalcBoundBox2, Object_CalcCoarseXDiff, Object_CalcCoarseYDiff, Object_CalcSpriteXY_NoHi, Object_Delete
+.export Object_DeleteOffScreen, Object_DeleteOffScreen_N2, Object_DeleteOffScreen_N4, Object_DetectTile
+.export Object_DetermineHorzVis, Object_DetermineHorzVisY, Object_DetermineVertVis, Object_DetermineVertVisY
+.export Object_DoCollision, Object_Draw16x16Sprite, Object_Draw16x32Sprite, Object_Draw24x16Sprite
+.export Object_DrawTallAndHFlip, Object_DrawWide, Object_FlipFace, Object_GetAttrAndMoveTiles
+.export Object_GetRandNearUnusedSpr, Object_HandleBumpUnderneath, Object_HandleConveyorBounceVel
+.export Object_HandleConveyorCarry, Object_HitGround, Object_HitTest, Object_HitTestRespond, Object_Move
+.export Object_SetDeadAndNotSpawned, Object_SetDeadEmpty, Object_SetPaletteFromAttr, Object_SetShellState
+.export Object_ShakeAndCalcSprite, Object_ShakeAndDraw, Object_ShakeAndDrawMirrored, Object_ToggleFrameBySpd
+.export Object_WorldDetect4, Object_WorldDetectN1, Objects_HandleScrollAndUpdate, PRG000_C49B, PRG000_D2B4, PRG000_DC09
+.export PSwitch_SubstTileAndAttr, Player_Die, Player_GetHurt, Player_HitEnemy, Podoboo_Splash, PowerUp_Ability
+.export Score_FindFreeSlot, Score_Get100PlusPts, Score_Get100PlusPtsY, Score_PopUp, Slope_LUT, Slope_LUT_Addr
+.export Slope_ObjectVel_Effect, Slope_PlayerVel_Effect, SpecialObj_FindEmptyAbort, SpecialObj_FindEmptyAbortY
+.export SpikesEnable, SprRamOffsets, ToadHouse_GiveItem, ToadItem_PalPerItem, Video_3CMFlowBot, Video_3CMFlowDiag
+.export Video_3CMFlowMid, Video_3CMFlowStem, Video_3CMFlowTop, Video_3CMMushBot, Video_3CMMushLeft, Video_3CMMushMid
+.export Video_3CMMushRight, Video_3CMMushTop
+
     ; Indexed per top 2 bits of tile ($00, $40, $80, $C0)
     ; Defines the shape of a slope tile for slope levels (Hills style and underground)
     ; Values used for Player_Slopes:
@@ -89,16 +118,16 @@ Slope_LUT:
 
     ; Effect on Player's velocity per slope "shape" index (Slope_LUT above)
 Slope_PlayerVel_Effect:
-    .byte $00, -$03,  $03,  $00,  $00,  $00,  $00,  $00 ; $00-$07
-    .byte $00,  $00,  $00,  $00, -$02, -$02,  $02,  $02 ; $08-$0F
+    .byte $00, <-$03,  $03,  $00,  $00,  $00,  $00,  $00 ; $00-$07
+    .byte $00,  $00,  $00,  $00, <-$02, <-$02,  $02,  $02 ; $08-$0F
     .byte $00,  $00,  $00,  $00,  $00           ; $10-$14
 
     ; Effect on Object's velocity per slope "shape" index (Slope_LUT above)
     ; NOTE: Incomplete -- probably avoids concering with certain ceiling slopes
 Slope_ObjectVel_Effect:
     ; $80 disables response to this slope
-    .byte $00, -$02,  $02,  $00,  $00,  $80,  $80,  $00 ; $00-$07
-    .byte $00,  $80,  $00,  $80, -$01, -$01,  $01,  $01 ; $08-$0F
+    .byte $00, <-$02,  $02,  $00,  $00,  $80,  $80,  $00 ; $00-$07
+    .byte $00,  $80,  $00,  $80, <-$01, <-$01,  $01,  $01 ; $08-$0F
     ; Incomplete, missing $10-$14
     ; SB: Slopes $10-$14 are ceiling slopes, which enemies have pretty much
     ; no proper involvement with in native SMB3.  Also due to a "lazy" calculation
@@ -279,16 +308,16 @@ Object_BoundBox:
     .byte  2,   4,   2,   8 ; 0
     .byte  1,  13,   2,   8 ; 1
     .byte  2,  12,   2,  24 ; 2
-    .byte 10,  27,  -2,  18 ; 3
+    .byte 10,  27,  <-2,  18 ; 3
     .byte  1,  14,   2,  26 ; 4 (UNUSED)
     .byte  5,  14,  10,  18 ; 5 (UNUSED)
-    .byte  2,  27,  -2,  34 ; 6
+    .byte  2,  27,  <-2,  34 ; 6
     .byte  2,  20,   2,  12 ; 7
-    .byte  2,  43,  -2,  18 ; 8
+    .byte  2,  43,  <-2,  18 ; 8
     .byte  2,  20,   2,  28 ; 9
     .byte  2,  12,   2,  20 ; A
-    .byte  0,  31,  -1,  14 ; B
-    .byte  1,  14,  -2,  13 ; C
+    .byte  0,  31,  <-1,  14 ; B
+    .byte  1,  14,  <-2,  13 ; C
     .byte  4,  17,  10,  19 ; D
     .byte  4,   8,   5,  40 ; E
     .byte  2,  43,   2,  12 ; F
@@ -561,7 +590,7 @@ PowerUp_Ability:
 
     ; Velocities set to X/Y directly to Player for what might be a now-unused debug routine of sorts
 PRG000_C3E7:
-    .byte $00, $30, -$30
+    .byte $00, $30, <-$30
 
 ; FIXME: Anybody want to claim this?
 ; Looks like maybe a leftover debug routine for some kind of "float around" mode maybe!!
@@ -799,7 +828,7 @@ PRG000_C4A7:
     SBC Horz_Scroll    ; Make relative to horizontal scroll
     STA CoinPUp_X,Y     ; Store as coin's X
 
-    LDA #-5
+    LDA #<-5
     STA CoinPUp_YVel,Y  ; Set Y Vel = -5
 
     LDA #$01
@@ -808,7 +837,7 @@ PRG000_C4A7:
     RTS      ; Return
 
 
-Conveyor_CarryX:    .byte -$01, $01 ; Left, Right
+Conveyor_CarryX:    .byte <-$01, $01 ; Left, Right
 Conveyor_CarryXHi:  .byte $FF, $00  ; 16-bit sign extension
 
     ; Checks for and handles object touching conveyor belt by carrying object
@@ -854,7 +883,7 @@ Object_HandleConveyorBounceVel:
 
     LDA Conveyor_CarryX,Y
 
-    LDY #-$01    ; Y = -$01
+    LDY #<-$01    ; Y = -$01
 
     EOR Objects_XVel,X  ; Check if object is not going with conveyor
     BMI PRG000_C511  ; If the signs differ (going against conveyor), jump to PRG000_C511
@@ -2170,7 +2199,7 @@ PRG000_CAF1:
 
     ; Some objects have "feet" when they are waking up,
     ; this offsets their Y depending on whether v-flipped
-ObjWakeUp_FeetYOff: .byte 10, -10
+ObjWakeUp_FeetYOff: .byte 10, <-10
 
     ; Called for an object in state 3 to do its "shelled" routine
 ObjState_Shelled:
@@ -2241,7 +2270,7 @@ PRG000_CB37:
     LSR A
     LSR A
     JSR Negate   ; Negate it
-    CMP #-$02
+    CMP #<-$02
     BGE PRG000_CB45  ; If object only lightly moving upward, jump to PRG000_CB45
 
     STA Objects_YVel,X  ; Set object Y velocity
@@ -2506,7 +2535,7 @@ PRG000_CC6B:
     RTS      ; Return
 
 
-ObjKickXvel:    .byte $18, -$18
+ObjKickXvel:    .byte $18, <-$18
 
 ObjState_Kicked:
     LDA Player_HaltGame
@@ -2635,7 +2664,7 @@ PRG000_CCF7:
     ASL A
     LDA #$10     ; A = $10
     BCC PRG000_CD17
-    LDA #-$10    ; A = -$10
+    LDA #<-$10    ; A = -$10
 PRG000_CD17:
     STA Objects_XVel,Y
 
@@ -2654,7 +2683,7 @@ PRG000_CD17:
     ASL A
     LDA #$10
     BCS PRG000_CD34
-    LDA #-$10
+    LDA #<-$10
 PRG000_CD34:
     STA Objects_XVel,X
 
@@ -2724,7 +2753,7 @@ ObjectKill_SetShellKillVars:
     STA Objects_State,X
 
     ; Bounce up a bit
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel,X
 
     ; Set ShellKillFlash vars
@@ -2823,21 +2852,21 @@ Object_BumpBlocks:
 
 
     ; X velocities depending on kick direction, added to by half of Player's X velocity
-ObjectKickXVelMoving:   .byte -$30, $30
+ObjectKickXVelMoving:   .byte <-$30, $30
 
     ; Set appropriate flip bits based on object's relative position to Player
 PlayerKickFlipBits: .byte $00, $40
 
     ; X velocities depending on kick direction
-BobombKickXVel: .byte -$28, $28
+BobombKickXVel: .byte <-$28, $28
 
     ; Different X and X Hi offsets applied to object being held by Player
     ; Changes whether not doing anything special, in pipe, etc.
-ObjectHoldXOff:     .byte $0B, -$0B, $04, -$04, $04, $0B, -$13, $04, -$08, $04, $00
+ObjectHoldXOff:     .byte $0B, <-$0B, $04, <-$04, $04, $0B, <-$13, $04, <-$08, $04, $00
 ObjectHoldXHiOff:   .byte $00,  $FF, $00,  $FF, $00, $00,  $FF, $00,  $FF, $00, $00
 
     ; Object-to-object hit resultant X velocity
-ObjectToObject_HitXVel: .byte -$08, $08
+ObjectToObject_HitXVel: .byte <-$08, $08
 
 ObjState_Held:
     LDA Player_IsDying
@@ -2888,7 +2917,7 @@ PRG000_CE54:
     STA Objects_State,X
 
     ; Set Y vel to -$20 (bounce up)
-    LDA #-$20
+    LDA #<-$20
     STA Objects_YVel,X
 
     ; Set X Velocity appropriately based on kick direction
@@ -2933,7 +2962,7 @@ PRG000_CE79:
     LDA Player_FlipBits
     BNE PRG000_CE94  ; If Player is not turned around, jump to PRG000_CE94
 
-    LDY #-1  ; Y = -1
+    LDY #<-1  ; Y = -1
 
 PRG000_CE94:
     STY Objects_XVel,X  ; Set minimum X velocity on object (to enable wall hit detection)
@@ -2955,7 +2984,7 @@ PRG000_CE94:
     STA Objects_State,X
 
     ; Set object Y velocity to -$40 (fly up a bit)
-    LDA #-$40
+    LDA #<-$40
     STA Objects_YVel,X
 
     ; Remove that minimum X velocity
@@ -3084,7 +3113,7 @@ PRG000_CF1F:
     ADC ObjectHoldXHiOff,Y
     STA Objects_XHi,X
 
-    LDA #-$02   ; A = -$02
+    LDA #<-$02   ; A = -$02
 
     LDY Objects_IsGiant,X
     BNE PRG000_CF3D  ; If object is giant, jump to PRG000_CF3D
@@ -3144,7 +3173,7 @@ PRG000_CF49:
     STA Objects_State,X
 
     ; Y velocity = -$30 (fly up a bit)
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel,X
 
     ; Object that got hit is dead!
@@ -3152,7 +3181,7 @@ PRG000_CF49:
     STA Objects_State,Y
 
     ; Y velocity = -$30 (fly up a bit)
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel,Y
 
     ; Get 100 pts for the hit!
@@ -3569,7 +3598,7 @@ PRG000_D120:
     STA Objects_State,X
 
     ; Set object Y velocity to -$40 (fly up after death)
-    LDA #-$40
+    LDA #<-$40
     STA Objects_YVel,X
 
     ; Halt horizontal movement
@@ -3627,7 +3656,7 @@ Object_FlipFace:
 
     RTS      ; Return
 
-PRG000_D16B:    .byte -$08, $08
+PRG000_D16B:    .byte <-$08, $08
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3647,7 +3676,7 @@ Object_HandleBumpUnderneath:
     ; Object detected a block bump tile (object got bumped)
 
     ; Set Y Vel to -$30 (bounce dead)
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel,X
 
     JSR Level_ObjCalcXDiffs ; Detect which side object is on versus Player
@@ -3749,7 +3778,7 @@ PRG000_D1DB:
 
     LDA RandomN,X
     AND #$1f     ; Cap 0-31
-    ADC #-$4C
+    ADC #<-$4C
     STA Objects_YVel,X  ; Object Y Vel = -$2D to -$4C
 
     ; Set object state to Killed
@@ -3983,7 +4012,7 @@ PRG000_D2B4:
     STA Objects_Timer2,X
 
     ; Set Player's Y velocity to -$40 (bounce!)
-    LDA #-$40
+    LDA #<-$40
     STA Player_YVel
 
     ; Play squish sound
@@ -5254,7 +5283,7 @@ Player_BoundBox:
 
 
 PRG000_D834:
-    .byte -8, 8
+    .byte <-8, 8
 
 
 
@@ -5448,7 +5477,7 @@ PRG000_D8EB:
     LDA #OBJSTATE_KILLED
     STA Objects_State,X  ; Set object state to Killed
 
-    LDA #-$38
+    LDA #<-$38
     STA Objects_YVel,X  ; Set Y Velocity to -$38
 
     ; "Kick" sound
@@ -5854,7 +5883,7 @@ Player_Die:
     LDA #$01
     STA Player_QueueSuit     ; Queue change to "small"
 
-    LDA #-64
+    LDA #<-64
     STA Player_YVel ; Player_YVel = -64
 
     LDA #$30
@@ -5903,7 +5932,7 @@ PRG000_DAC0:
     LDA Player_X
     STA SpecialObj_XLo,Y
 
-    LDA #-$30
+    LDA #<-$30
     STA SpecialObj_YVel,Y    ; Y velocity = -$30
 
     ; Decide proper X velocity based on Player's facing direction
@@ -5913,7 +5942,7 @@ PRG000_DAC0:
     LDA #16
     BGE PRG000_DAE3
 
-    LDA #-16
+    LDA #<-16
 
 PRG000_DAE3:
     STA SpecialObj_XVel,Y    ; Set appropriate X velocity
@@ -5927,13 +5956,13 @@ PRG000_DAE3:
 
     ; X velocities as appropriate based on which direction
     ; Player was when he killed the enemy
-EnemyKill_XVels:    .byte -$08, $08
+EnemyKill_XVels:    .byte <-$08, $08
 
     ; Tail attack X offset, based on Player's facing direction
-Player_TailAttackXOff:  .byte $11, -$0A
+Player_TailAttackXOff:  .byte $11, <-$0A
 
 PRG000_DAF0:
-    .byte -$0A, $11
+    .byte <-$0A, $11
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -5971,7 +6000,7 @@ PRG000_DB16:
     RTS      ; Return
 
 
-PRG000_DB17:    .byte $10, -$10
+PRG000_DB17:    .byte $10, <-$10
 
 
 Object_RespondToTailAttack:
@@ -6127,14 +6156,14 @@ PRG000_DBC8:
 PRG000_DBCF:
     STA Objects_State,X  ; Set new object state
 
-    LDA #-$30    ; A = -$30
+    LDA #<-$30    ; A = -$30
 
     LDY Temp_Var4
 
     CPY #$0f
     BEQ PRG000_DBDC  ; If Temp_Var4 = $0F, jump to PRG000_DBDC
 
-    LDA #-$50    ; A = -$50
+    LDA #<-$50    ; A = -$50
 
 PRG000_DBDC:
     STA Objects_YVel,X  ; Set Y velocity appropriately
@@ -6378,7 +6407,7 @@ Object_CalcCoarseXDiff:
 ; Temp_Var16 holds the raw difference in "Y Hi"
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ; $DCB9
-Object_CalcCoarseYDiff
+Object_CalcCoarseYDiff:
     LDA Objects_Y,X
     SEC
     SBC Player_Y
@@ -6782,7 +6811,7 @@ PRG000_DE03:
     SBC Temp_Var1       ; was object X / 4
     STA Objects_XVel    ; Set as X velocity
 
-    LDA #-$30
+    LDA #<-$30
     STA Objects_YVel    ; Object's Y velocity = -$30
 
     LDA #$00
@@ -6906,28 +6935,28 @@ PRG000_DEBB:
     ; This is the initial movement table for horizontal auto scroll levels, minus 1
     ; Level_AScrlLimitSel selects which entry to use, which sets Level_AScrlVar (the actual index value)
 AScroll_HorizontalInitMove:
-    .byte ASM_World_36_14 - AScroll_Movement - 1    ;  0 World 3-6 / 1-4
-    .byte ASM_W3_Airship - AScroll_Movement - 1 ;  1 World 3 Airship
-    .byte ASM_World_62 - AScroll_Movement - 1   ;  2 World 6-2
-    .byte ASM_W5_Airship - AScroll_Movement - 1 ;  3 World 5 Airship
-    .byte ASM_UNK4 - AScroll_Movement - 1       ;  4
-    .byte ASM_W4Airship - AScroll_Movement - 1  ;  5 World 4 Airship
-    .byte ASM_W6Airship - AScroll_Movement - 1  ;  6 World 6 Airship
-    .byte ASM_World_56 - AScroll_Movement - 1   ;  7 World 5-6
-    .byte ASM_UNK8 - AScroll_Movement - 1       ;  8
-    .byte ASM_UNK9 - AScroll_Movement - 1       ;  9
-    .byte ASM_World_67 - AScroll_Movement - 1   ;  A World 6-7
-    .byte ASM_W1Airship - AScroll_Movement - 1  ;  B World 1 Airship
-    .byte ASM_W7Airship - AScroll_Movement - 1  ;  C World 7 Airship
-    .byte ASM_W8Airship - AScroll_Movement - 1  ;  D World 8 Airship
-    .byte ASM_W8Battleship - AScroll_Movement - 1   ;  E World 8 Battleship
-    .byte ASM_World_74 - AScroll_Movement - 1   ;  F World 7-4
-    .byte ASM_W1CoinHeaven - AScroll_Movement - 1       ; 10
-    .byte ASM_CoinShip - AScroll_Movement - 1   ; 11 Coin Ship
-    .byte ASM_UNK12 - AScroll_Movement - 1      ; 12
-    .byte ASM_World8Tank1 - AScroll_Movement - 1    ; 13 World 8 Tank 1
-    .byte ASM_World8Tank2 - AScroll_Movement - 1    ; 14 World 8 Tank 2
-    .byte ASM_Terminator - AScroll_Movement - 1 ; 15 ** Terminator Only (because it seeks ahead to see the terminating movement index)
+    BYTE_INDEX_TO ASM_World_36_14, AScroll_Movement    ;  0 World 3-6 / 1-4
+    BYTE_INDEX_TO ASM_W3_Airship, AScroll_Movement     ;  1 World 3 Airship
+    BYTE_INDEX_TO ASM_World_62, AScroll_Movement       ;  2 World 6-2
+    BYTE_INDEX_TO ASM_W5_Airship, AScroll_Movement     ;  3 World 5 Airship
+    BYTE_INDEX_TO ASM_UNK4, AScroll_Movement           ;  4
+    BYTE_INDEX_TO ASM_W4Airship, AScroll_Movement      ;  5 World 4 Airship
+    BYTE_INDEX_TO ASM_W6Airship, AScroll_Movement      ;  6 World 6 Airship
+    BYTE_INDEX_TO ASM_World_56, AScroll_Movement       ;  7 World 5-6
+    BYTE_INDEX_TO ASM_UNK8, AScroll_Movement           ;  8
+    BYTE_INDEX_TO ASM_UNK9, AScroll_Movement           ;  9
+    BYTE_INDEX_TO ASM_World_67, AScroll_Movement       ;  A World 6-7
+    BYTE_INDEX_TO ASM_W1Airship, AScroll_Movement      ;  B World 1 Airship
+    BYTE_INDEX_TO ASM_W7Airship, AScroll_Movement      ;  C World 7 Airship
+    BYTE_INDEX_TO ASM_W8Airship, AScroll_Movement      ;  D World 8 Airship
+    BYTE_INDEX_TO ASM_W8Battleship, AScroll_Movement   ;  E World 8 Battleship
+    BYTE_INDEX_TO ASM_World_74, AScroll_Movement       ;  F World 7-4
+    BYTE_INDEX_TO ASM_W1CoinHeaven, AScroll_Movement   ; 10
+    BYTE_INDEX_TO ASM_CoinShip, AScroll_Movement       ; 11 Coin Ship
+    BYTE_INDEX_TO ASM_UNK12, AScroll_Movement          ; 12
+    BYTE_INDEX_TO ASM_World8Tank1, AScroll_Movement    ; 13 World 8 Tank 1
+    BYTE_INDEX_TO ASM_World8Tank2, AScroll_Movement    ; 14 World 8 Tank 2
+    BYTE_INDEX_TO ASM_Terminator, AScroll_Movement     ; 15 ** Terminator Only (because it seeks ahead to see the terminating movement index)
 
 Video_3CMMushTop:
     DBYT $208D
@@ -7072,7 +7101,7 @@ Video_3CMFlowStem:
     .byte $04, $A9, $FC, $FC, $A9
     .byte $00   ; Terminator
 
-Video_3CMFlowBot
+Video_3CMFlowBot:
     DBYT $220B
     .byte $01, $A9
     DBYT $2214

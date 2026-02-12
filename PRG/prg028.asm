@@ -11,6 +11,16 @@
 ; This source file last updated: 2011-11-18 21:50:33.000000000 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_28"
+
+.export Music_Set1_Set2A_Headers, Music_Set1_Set2A_IndexOffs, Music_Set2A_Ends, Music_Set2A_Loops, Music_Set2A_Starts
+.export Music_Set2B_Ends, Music_Set2B_Headers, Music_Set2B_IndexOffs, Music_Set2B_Loops, Music_Set2B_Starts
+.export PatL1, PatL2, PatL3, PatL4, PatL5, PatL6, PatL8, PatS1, PatS2, PatS3, PatS4
+.export PatS5, PatS6, PatS8, Sound_Engine_Begin
 
 Sound_Engine_Begin:
     LDA #$ff     ;
@@ -1193,7 +1203,7 @@ SndLev2_SkidNCtl:
    .byte _4 ; Square 1 track starting offset (cannot be disabled)
    .byte _5 ; Noise track starting offset ($00 means disabled)
    .byte _6 ; DCM track starting offset ($00 means disabled)
-   .endm    ; Square 2 cannot be disabled and always starts at offset $00
+   .endmacro    ; Square 2 cannot be disabled and always starts at offset $00
 
 
 Music_Set1_Set2A_IndexOffs:

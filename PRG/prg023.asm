@@ -11,6 +11,17 @@
 ; This source file last updated: 2012-01-15 12:25:51.067135346 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_23"
+
+.export LeveLoad_FixedSizeGen_TS10, LevelLoad_TS10, LoadLevel_Generator_TS10, Tile_Attributes_TS10, Tile_Layout_TS10
+.export CoinShipL, W1AirshipL, W1Airship_IntroL, W2AirshipL, W2Airship_IntroL, W3AirshipL
+.export W3Airship_IntroL, W4AirshipL, W4Airship_IntroL, W5AirshipL, W5Airship_IntroL
+.export W6AirshipL, W6Airship_IntroL, W7AirshipL, W7Airship_IntroL, W8AirshipL, W8BSL, W8T1L, W8T2L
+
 Tile_Layout_TS10:
     ; This defines the individual 8x8 blocks used to construct one of the tiles
     ; Referenced by Address_Per_Tileset, addressed by Level_Tileset
@@ -1094,7 +1105,7 @@ PRG023_A86D:
     JMP PRG023_A85C  ; Jump to PRG023_A85C
 
 PRG023_A887:
-    BPL $A85C    ; $A887
+    BPL PRG023_A85C
     RTS      ; Return
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -1601,7 +1612,7 @@ LL_RockyTiles:  .byte TILE10_LEDGE, TILE10_ROCKYWRENCH_HOLE
 ;
 ; Adds Rocky Wrench's hole
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-LoadLevel_RockyWrenchHole
+LoadLevel_RockyWrenchHole:
     LDX #$01
 PRG023_AB45:
     LDY TileAddr_Off ; Y = TileAddr_Off

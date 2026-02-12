@@ -11,6 +11,17 @@
 ; This source file last updated: 2012-01-04 18:56:24.850111672 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_18"
+
+.export LeveLoad_FixedSizeGen_TS678, LevelLoad_TS6, LevelLoad_TS7, LevelLoad_TS8, LoadLevel_Generator_TS678
+.export Tile_Attributes_TS6_TS7_TS8, Tile_Layout_TS6_TS7_TS8
+.export TOADL, TOAD_SpecL, Unused8L, W301L, W305L, W4F2_BonusL, W502_UnderL
+.export W701_MazeL, W704_WaterL, W706_MazeL
+
 Tile_Layout_TS6_TS7_TS8:
     ; This defines the individual 8x8 blocks used to construct one of the tiles
     ; Referenced by Address_Per_Tileset, addressed by Level_Tileset
@@ -367,7 +378,7 @@ LeveLoad_FixedSizeGen_TS678:
 
     ; If the pipe being constructed crosses one of these...
 LL_SceneryVPipe_CrossChk:   .byte TILE8_SCENPIPE_HT,     TILE8_SCENPIPE_HB,     TILE8_MINIPIPE_HM,     TILE1_PIPEHT,          TILE1_PIPEHB
-LL_SceneryVPipe_CrossChk_End
+LL_SceneryVPipe_CrossChk_End:
 
     ; Replace it with corresponding cross tile!
 LL_SceneryVPipe_CrossL: .byte TILE8_SCENPIPE_VL_HTC, TILE8_SCENPIPE_VL_HBC, TILE8_SCENPIPE_VL_HMC, TILE8_SCENPIPE_VL_HTC, TILE8_SCENPIPE_VL_HBC
@@ -540,7 +551,7 @@ PRG018_A62C:
 
     ; If the pipe being constructed crosses one of these...
 LL_SceneryHPipe_CrossChk:   .byte TILE1_PIPEVL, TILE1_PIPEVR, TILE8_MINIPIPE_VM
-LL_SceneryHPipe_CrossChk_End
+LL_SceneryHPipe_CrossChk_End:
 
     ; Replace it with corresponding cross tile!
 LL_SceneryHPipe_CrossT: .byte TILE8_SCENPIPE_HT_VLC, TILE8_SCENPIPE_HT_VRC, TILE8_SCENPIPE_HT_VMC
@@ -783,7 +794,7 @@ PRG018_A730:
 ; Inserts a 1-16 width right-ended horizontal background pipe
 ; For vertical pipe maze levels only!
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-LoadLevel_BGHPipeRight;
+LoadLevel_BGHPipeRight:
     LDA LL_ShapeDef
     AND #$0f
     STA Temp_Var3       ; Temp_Var3 = lower 4 bits of LL_ShapeDef (height of pipe)

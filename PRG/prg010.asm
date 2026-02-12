@@ -11,6 +11,18 @@
 ; This source file last updated: 2011-11-18 21:50:33.000000000 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_10"
+
+.export Map_Object_Valid_Tiles2Check, DMC03, DMC03_End, DMC07, DMC07_End, DMC08, DMC08_End, FX_MonoFlash_By_MapTick
+.export GameOver_Loop, GameOver_PatchPlayerName, MapTile_Get_By_Offset, Map_ConfigWorldIntro, Map_DoMap, Map_DrawAndPan
+.export Map_GetTile, Map_IntroAttrSave, Map_Object_Valid_Tiles, Map_W8DarknessFill, Map_W8DarknessUpdate
+.export Scroll_Map_SpriteBorder, Video_DoGameOver00, Video_DoGameOver80, Video_DoW2WZ, Video_DoWXLuigi00
+.export Video_DoWXLuigi80, Video_DoWXMario00, Video_DoWXMario80, World5_Sky_AddCloudDeco, WorldMap_UpdateAndDraw
+
 Video_DoWXMario00:
     DBYT $2908
     .byte $01, $A0
@@ -45,7 +57,7 @@ Video_DoWXMario00:
     DBYT $29C9
     .byte VU_REPEAT | 14, $FE
 
-    DBYT $29E8,
+    DBYT $29E8
     .byte $01, $E3
 
     DBYT $29E9
@@ -392,7 +404,7 @@ Video_DoWXLuigi00:
     DBYT $29C9
     .byte VU_REPEAT | 14, $FE
 
-    DBYT $29E8,
+    DBYT $29E8
     .byte $01, $E3
 
     DBYT $29E9
@@ -723,7 +735,7 @@ PRG010_C3AC:
 
     RTS      ; Return
 
-Map_ScrollDeltaX:   .byte 2, -2 ; Based on scroll direction, moves Horz_Scroll by this amount
+Map_ScrollDeltaX:   .byte 2, <-2 ; Based on scroll direction, moves Horz_Scroll by this amount
 Map_ScrollDeltaXHi: .byte 0, $FF    ; sign extension to above
 
     ; The BGM per world at initial arrival (see also World_BGM in PRG030)
@@ -929,7 +941,7 @@ Map_DoOperation:
 World5_Sky_CloudDeco:
     ; Sprite data of a single cloud over the lower world
     .byte $30, $7D, $03, $48, $30, $7F, $03, $50, $30, $A3, $03, $58, $30, $A5, $03, $60
-World5_Sky_CloudDeco_End
+World5_Sky_CloudDeco_End:
 
 World5_Sky_AddCloudDeco:
     ; All this does is on World 5, Sky part ONLY, add a cloud
@@ -1306,7 +1318,7 @@ PRG010_C69D:
     STX Map_Intro_ATOff    ; Update Map_Intro_ATOff
 
 
-PRG010_C69F
+PRG010_C69F:
 
     ; If, on the next +2 to Map_Intro_NTOff, the lower 5 bits are "zero",
     ; it has wrapped to a new row.  This should only happen when the "World X"
@@ -2138,7 +2150,7 @@ PRG010_CB39:
     .byte $01, $00
 
     .byte $00   ; Terminator
-PRG010_CB39_End
+PRG010_CB39_End:
 
 ; FIXME: Anybody want to claim this??
 ; $CB52
@@ -2174,7 +2186,7 @@ PRG010_CB6B:
     .byte $01, $00
 
     .byte $00   ; Terminator
-PRG010_CB6B_End
+PRG010_CB6B_End:
 
 Border_TopCorners:  .byte $80, $81, $FF ; Upper left corner, upper right corner, and a black one more to the right
 Border_VertEdges:   .byte $CC, $CC, $FF ; Border left, border right, and a black one more to the right
@@ -2569,12 +2581,12 @@ PRG010_CD6E:
     JMP WorldMap_UpdateAndDraw  ; Jump to WorldMap_UpdateAndDraw
 
     ; Amount to move on map when standard or in canoe ('C')
-MapMove_DeltaY:     .byte   0,   0,   0,   0,   2,   0,   0,   0,  -2
-MapMove_DeltaX:     .byte   0,   2,  -2,   0,   0,   0,   0,   0,   0
+MapMove_DeltaY:     .byte   0,   0,   0,   0,   2,   0,   0,   0,  <-2
+MapMove_DeltaX:     .byte   0,   2,  <-2,   0,   0,   0,   0,   0,   0
 MapMove_DeltaXHi:   .byte   0,   0, $FF,   0,   0,   0,   0,   0,   0   ; sign extension $FF
 
-MapMove_DeltaYC:    .byte   0,   0,   0,   0,   1,   0,   0,   0,  -1
-MapMove_DeltaXC:    .byte   0,   1,  -1,   0,   0,   0,   0,   0,   0
+MapMove_DeltaYC:    .byte   0,   0,   0,   0,   1,   0,   0,   0,  <-1
+MapMove_DeltaXC:    .byte   0,   1,  <-1,   0,   0,   0,   0,   0,   0
 MapMove_DeltaXHiC:  .byte   0,   0, $FF,   0,   0,   0,   0,   0,   0   ; sign extension $FF
 
 MapMove_DeltaDiff = MapMove_DeltaYC - MapMove_DeltaY    ; For clarity
@@ -2965,7 +2977,7 @@ Map_BorderSprites:
     .byte $B0, $09, $01, $08
     .byte $B0, $07, $01, $F0
     .byte $B0, $0B, $01, $F8
-Map_BorderSprites_End
+Map_BorderSprites_End:
 
 Map_DrawPlayer:
     LDX Player_Current  ; X = Player_Current
@@ -3400,9 +3412,9 @@ Map_DrawBridgeCheckV:   .byte $00, $00, $01, $01
 
     ; Appropriate Y, X, and XHi offsets to check for a canoe based on direction 0-3
     ; 0-3 (right, left, down, up respectively)
-Map_CanoeCheckYOff: .byte  0,   0, 16, -16
-Map_CanoeCheckXOff: .byte 16, -16,  0,   0
-Map_CanoeCheckXHiOff:   .byte  0,  $FF, 0,   0  ; Remember, this is used more as a 16-bit sign extension, hence $FF in position of X's -16
+Map_CanoeCheckYOff: .byte  0,   0, 16, <-16
+Map_CanoeCheckXOff: .byte 16, <-16,  0,   0
+Map_CanoeCheckXHiOff:   .byte  0,  $FF, 0,   0  ; Remember, this is used more as a 16-bit sign extension, hence $FF in position of X's <-16
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -3446,7 +3458,7 @@ PRG010_D2A5:
 
     ; This loop converts R01 L02 D04 U08 to 0, 1, 2, 3
     LDY #$00        ; Y = 0
-PRG010_D2A7
+PRG010_D2A7:
     LSR A           ; A >>= 1
     BCS PRG010_D2AD     ; If the LSb of 'A' was set, jump to PRG010_D2AD
     INY         ; Y++
@@ -3624,9 +3636,9 @@ PRG010_D359:
 ; 2 = Below
 ; 3 = Above
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-Search_YOff:    .byte -16, -16, 0, -32
-Search_XHiOff:  .byte   0,  -1, 0,   0
-Search_XOff:    .byte  16, -16, 0,   0
+Search_YOff:    .byte <-16, <-16, 0, <-32
+Search_XHiOff:  .byte   0,  <-1, 0,   0
+Search_XOff:    .byte  16, <-16, 0,   0
 
 MapTile_Get_By_Offset:  ; $D369
     ; Y is a value from 0-3 specifying a "search direction"
@@ -3670,8 +3682,8 @@ MapTile_Get_By_Offset:  ; $D369
     RTS         ; Return!
 
     ; Offsets around Player for darkness effect
-Map_W8D_XOffTable:  .byte -16, 32, 32, -16
-Map_W8D_YOffTable:  .byte -16, 32, 32, -16
+Map_W8D_XOffTable:  .byte <-16, 32, 32, <-16
+Map_W8D_YOffTable:  .byte <-16, 32, 32, <-16
 
     ; Update darkness around Player
 Map_W8DarknessUpdate:
@@ -3980,8 +3992,11 @@ PRG010_D535:
     ; There's quite a bit of unused space here; I removed it because it is safe for data
     ; to expand from the ending address above ($D542) up to the DMC data.  But the DMC
     ; data itself must not leave an alignment divisible by $40.
+    ;;;; orange - ld65 warns about a ".align $300", so we just stick the number of $ff's
+    ;;;; in that they used here and then align $40.
+.res $280
+.align $40
 
-    .pad $D800, $FF   ; <-- Modify to suit, but must align to an address evenly divisible by $40 (assembler needs an ALIGN directive!)
 DMC07:
     .byte $4A, $53, $55, $55, $55, $55, $55, $55, $55, $55, $AB, $4A, $55, $AA, $DA, $EE
     .byte $2D, $55, $82, $00, $01, $B5, $DD, $BE, $EF, $FB, $AE, $55, $97, $48, $00, $04
@@ -4035,7 +4050,7 @@ DMC07:
     .byte $55, $29, $95, $2A, $55, $95, $55, $55, $55, $AB, $D6, $AA, $D5, $5A, $AD, $5A
     .byte $D5, $AA, $AA, $AA, $4A, $55, $A9, $52, $A5, $4A, $95, $2A, $55, $AA, $54, $55
     .byte $55, $55, $B5, $AA, $D5, $AA, $55, $6B, $B5, $6A, $55, $35, $55, $55, $55, $A9
-DMC07_End
+DMC07_End:
 
     ; BEGIN UNUSED SPACE
     .byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF
@@ -4053,7 +4068,7 @@ DMC03:
     .byte $3F, $00, $EC, $C0, $FF, $FF, $00, $80, $FF, $43, $0B, $10, $F8, $FF, $03, $00
     .byte $BE, $EB, $FF, $05, $00, $FF, $8B, $42, $18, $A5, $7F, $D7, $09, $80, $D5, $2F
     .byte $1D, $40, $B7, $FF, $07, $C0, $4E, $2F, $45, $96, $64, $BB, $8B, $C4, $AA, $72
-DMC03_End
+DMC03_End:
 
 DMC08:
     .byte $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $55, $05, $FC, $07, $F0, $FF
@@ -4084,7 +4099,7 @@ DMC08:
     .byte $2B, $25, $B5, $DD, $44, $AA, $6A, $2B, $69, $A5, $DA, $B6, $24, $A8, $BD, $25
     .byte $A9, $B2, $DD, $48, $52, $6D, $AB, $52, $55, $25, $6D, $5B, $49, $AA, $AD, $2A
     .byte $49, $6D, $AB, $52, $53, $A5, $B2, $AD, $2A, $55, $55, $49, $6D, $57, $21, $B6
-DMC08_End
+DMC08_End:
 
 ; Rest of ROM bank was empty
 

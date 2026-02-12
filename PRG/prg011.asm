@@ -11,6 +11,17 @@
 ; This source file last updated: 2011-11-18 21:50:36.000000000 -0600
 ; Distribution package date: Fri Apr  6 23:46:16 UTC 2012
 ;---------------------------------------------------------------------------
+.autoimport +
+
+.include "smb3.inc"
+
+.segment "PRG_11"
+
+.export GameOver_AlignToStartY, GameOver_ReturnToStartX, GameOver_TwirlFromAfar, GameOver_TwirlToStart, LT0, LT0B
+.export MO_CheckForBonus, MO_DoLevelClear, MO_HandTrap, MO_SkidAfarFinish, MO_SkidAfarPrep, MO_SkidToPrev
+.export MO_SkidToPrevAfar, MapObjects_UpdateDrawEnter, MapStarsIntro_DoStarFX, Map_DoAnimations, Map_DoMap_WarpWind_FX
+.export Map_DrawClearLevelPoof, Map_Init
+
 PRG011_A000:
     .byte $00, $01, $02, $03, $04, $05, $06, $07
 
@@ -285,7 +296,7 @@ WorldMap_UpdateAndDrawInd:
     JMP WorldMap_UpdateAndDraw
 
 Map_WW_StartX:  .byte 0, 240    ; Map warp wind starting X position, depending which direction it comes from
-Map_WW_DeltaX:  .byte 2, -2 ; Position change depending on the direction of travel
+Map_WW_DeltaX:  .byte 2, <-2 ; Position change depending on the direction of travel
 Map_WW_TargetX: .byte 240, 0    ; The ending position, depending on direction of travel
 
     ; Starting Y position depending on what world you came from
@@ -648,7 +659,7 @@ PRG011_A4B8:
     JMP PRG011_A503         ; Jump to PRG011_A503
 
     ; Hand Trap raises for 16 ticks (-1), then falls (1)
-HT_RaiseFall:   .byte -1, 1
+HT_RaiseFall:   .byte <-1, 1
 
 HT_DoRaiseAndFall:
     LDA Counter_1
@@ -1132,7 +1143,7 @@ PRG011_A727:
     RTS      ; Return
 
 
-GameOver_AlignToStartY
+GameOver_AlignToStartY:
     LDX Player_Current   ; X = Player_Current
 
     ; Enter from right side
@@ -1562,7 +1573,7 @@ MO_SkidAfarPrep:
     LDY #112     ; Y = 112
 
 PRG011_A941:
-    STY World_Map_X,X ; Set proper World Map X to begin skidding from
+    STY World_Map_X, X ; Set proper World Map X to begin skidding from
 
     JMP PRG011_A95B  ; Jump to PRG011_A95B
 
@@ -1684,7 +1695,7 @@ Map_CompleteTile:
     ; quadrants always "poof" except fortress tiles)
 Map_ForcePoofTiles:
     .byte TILE_TOADHOUSE, TILE_SPADEBONUS, TILE_HANDTRAP, TILE_DANCINGFLOWER, TILE_ALTTOADHOUSE
-Map_ForcePoofTiles_End
+Map_ForcePoofTiles_End:
 
 Map_PanelCompletePats:
     .byte $88, $89, $8A, $8B    ; Mario Complete panel patterns
@@ -1695,7 +1706,7 @@ Map_PanelCompletePats:
     ; will not cause the Player to end their turn (in a 2P game)
 Map_NoLoseTurnTiles:
     .byte TILE_TOADHOUSE, TILE_ALTTOADHOUSE, TILE_SPADEBONUS, TILE_PIPE, TILE_SPIRAL
-Map_NoLoseTurnTiles_End
+Map_NoLoseTurnTiles_End:
 
 MO_DoLevelClear:
 
@@ -2189,7 +2200,7 @@ PRG011_ABF9:
 
 Map_WhiteObjects:
     .byte MAPOBJ_NSPADE, MAPOBJ_WHITETOADHOUSE, MAPOBJ_COINSHIP, MAPOBJ_UNK0C
-Map_WhiteObjects_End
+Map_WhiteObjects_End:
 
 MO_CheckForBonus:
 
@@ -2588,19 +2599,19 @@ PRG011_AE0B:
     .word Map_Object_Canoe      ; Canoe
 
     ; Based on march travel direction, these are the movements
-Map_Object_Travel_Y:    .byte 0, 0, 1, -1
-Map_Object_Travel_X:    .byte 1, -1, 0, 0
-Map_Object_Travel_XHi:  .byte 0, -1, 0, 0
+Map_Object_Travel_Y:    .byte 0, 0, 1, <-1
+Map_Object_Travel_X:    .byte 1, <-1, 0, 0
+Map_Object_Travel_XHi:  .byte 0, <-1, 0, 0
 
 Map_Object_March_Offset:
     ; For a 32 position march, offset to the object's X coordinate
-    .byte -8, -7, -6, -5, -4, -3, -2, -1,  0,  1,  2,  3,  4,  5,  6,  7
-    .byte  8,  7,  6,  5,  4,  3,  2,  1,  0, -1, -2, -3, -4, -5, -6, -7
+    .byte <-8, <-7, <-6, <-5, <-4, <-3, <-2, <-1,  0,  1,  2,  3,  4,  5,  6,  7
+    .byte  8,  7,  6,  5,  4,  3,  2,  1,  0, <-1, <-2, <-3, <-4, <-5, <-6, <-7
 
 Map_Object_March_OffsetXHi:
     ; For a 32 position march, offset to the object's X Hi coordinate
-    .byte -1, -1, -1, -1, -1, -1, -1, -1,  0,  0,  0,  0,  0,  0,  0,  0
-    .byte  0,  0,  0,  0,  0,  0,  0,  0,  0, -1, -1, -1, -1, -1, -1, -1
+    .byte <-1, <-1, <-1, <-1, <-1, <-1, <-1, <-1,  0,  0,  0,  0,  0,  0,  0,  0
+    .byte  0,  0,  0,  0,  0,  0,  0,  0,  0, <-1, <-1, <-1, <-1, <-1, <-1, <-1
 
 Map_Object_March:
     ; For all map objects which "march" back and forth (includes Hammer/etc. Brothers, and bonuses...)
@@ -3335,14 +3346,14 @@ Map_Object_March_UpdateXs:
 
     ; Travel directions:
     ; 0 = Right, 1 = Left, 2 = Down, 3 = Up
-Map_Object_March_YOffByDir: .byte 0, 0, 16, -16 ; Travel direction Y offsets for marching map brother
-                .byte 0, 0, 32, -32 ; Next tile over; if the first tile is OK, see if the destination is OK too
+Map_Object_March_YOffByDir: .byte 0, 0, 16, <-16 ; Travel direction Y offsets for marching map brother
+                .byte 0, 0, 32, <-32 ; Next tile over; if the first tile is OK, see if the destination is OK too
 
-Map_Object_March_XOffByDir: .byte 16, -16, 0, 0 ; Travel direction X offsets for marching map brother
-                .byte 32, -32, 0, 0 ; Next tile over; if the first tile is OK, see if the destination is OK too
+Map_Object_March_XOffByDir: .byte 16, <-16, 0, 0 ; Travel direction X offsets for marching map brother
+                .byte 32, <-32, 0, 0 ; Next tile over; if the first tile is OK, see if the destination is OK too
 
-Map_Object_March_XHiOffByDir:   .byte 0, -1, 0, 0   ; Travel direction X Hi offsets for marching map brother
-                .byte 0, -1, 0, 0   ; Next tile over; if the first tile is OK, see if the destination is OK too
+Map_Object_March_XHiOffByDir:   .byte 0, <-1, 0, 0   ; Travel direction X Hi offsets for marching map brother
+                .byte 0, <-1, 0, 0   ; Next tile over; if the first tile is OK, see if the destination is OK too
 
     ; Tiles that are forbidden for the marching object to "land" on
 Map_Object_Forbid_LandingTiles:
@@ -3351,7 +3362,7 @@ Map_Object_Forbid_LandingTiles:
     .byte TILE_SPIRAL,      TILE_ALTSPIRAL,   TILE_FORTRUBBLE,  TILE_MARIOCOMP_G
     .byte TILE_LUIGICOMP_G, TILE_MARIOCOMP_R, TILE_LUIGICOMP_R, TILE_ALTRUBBLE
     .byte TILE_START
-Map_Object_Forbid_LT_End
+Map_Object_Forbid_LT_End:
 
     ; This makes it safe to expand the above
     ; There's a mistake in here somewhere, I think Nintendo did their loop/indexing wrong
@@ -3363,7 +3374,7 @@ MOV_Landings2Check = (Map_Object_Forbid_LT_End - Map_Object_Forbid_LandingTiles)
     ; I don't know why these are split from the above?
 Map_MarchXtraForbidTiles:
     .byte TILE_TOADHOUSE, TILE_ALTTOADHOUSE, TILE_CASTLEBOTTOM, TILE_PATHANDNUB ; <-- Last one is weird "enterable"!
-Map_MarchXtraForbidTiles_End
+Map_MarchXtraForbidTiles_End:
 
 
 Map_MarchValidateTravel:
@@ -3433,7 +3444,7 @@ PRG011_B3D3:
     LDY Temp_Var3      ; Y = Temp_Var3 (travel target)
     LDA (Map_Tile_AddrL),Y  ; Get tile here
 
-    LDY #Map_Object_Valid_Tiles2Check-1   ; Check all possible travel-over tiles
+    LDY #<(Map_Object_Valid_Tiles2Check-1)   ; Check all possible travel-over tiles
 PRG011_B3EC:
     CMP (Temp_Var15),Y
     BEQ PRG011_B3F5     ; If this tile is valid to travel over, jump to PRG011_B3F5
@@ -4014,9 +4025,9 @@ PRG011_B703:
 
     ; FIXME: Anyone want to claim this?
     ; Gets a tile based on an input 'Y' value to pick from one of the offset sets below...
-PRG011_B706:    .byte -16, -16, 0, -32
+PRG011_B706:    .byte <-16, <-16, 0, <-32
 PRG011_B70A:    .byte $00, $FF, $00, $00    ; 16-bit sign extensions
-PRG011_B70E:    .byte 16, -16, 0, 0
+PRG011_B70E:    .byte 16, <-16, 0, 0
 
 ; $B712
     LDX Player_Current   ; X = Player_Current
@@ -4412,8 +4423,8 @@ MSI_CalcStarsXY:
     BLT PRG011_B917     ; If (Map_StarsRadius[X] & $18) < 16, jump to PRG011_B917
 
     ; Otherwise...
-    LDA #-1
-    STA Temp_Var1      ; Temp_Var1 = -1
+    LDA #<-1
+    STA Temp_Var1      ; Temp_Var1 = <-1
 
     LDA Map_StarsCenterX
     SBC Temp_Var3      ; A = Map_StarsCenterX - Temp_Var3 (calculated value from MSI_CalcXOffset)
@@ -4433,7 +4444,7 @@ PRG011_B91F:
     LDA Map_StarsCenterX
     STA Temp_Var8      ; Temp_Var8 = all stars center X
 
-    JSR PRG011_SUB_B9D4 ; Returns 1 or -1 in Temp_Var6
+    JSR PRG011_SUB_B9D4 ; Returns 1 or <-1 in Temp_Var6
 
     LDA Temp_Var6
     BMI PRG011_B980     ; If Temp_Var6 < 0, jump to PRG011_B980
@@ -4444,7 +4455,7 @@ PRG011_B91F:
     STA Temp_Var10     ; Temp_Var10 = star's X + 8 (will be second sprite's offset)
     STA Temp_Var7      ; Temp_Var7 = Temp_Var10
 
-    JSR PRG011_SUB_B9D4 ; Returns 1 or -1 in Temp_Var6
+    JSR PRG011_SUB_B9D4 ; Returns 1 or <-1 in Temp_Var6
 
     LDA Temp_Var6
     BMI PRG011_B980     ; If Temp_Var6 < 0, jump to PRG011_B980
@@ -4468,8 +4479,8 @@ PRG011_B91F:
     CMP #16
     BLT PRG011_B968     ; If ((Map_StarsRadius[X] - 8) & $18) < 16, jump to PRG011_B968
 
-    LDA #-1
-    STA Temp_Var1      ; Temp_Var1 = -1
+    LDA #<-1
+    STA Temp_Var1      ; Temp_Var1 = <-1
 
     LDA Map_StarsCenterY
     SBC Temp_Var3      ; A = Map_StarsCenterX - Temp_Var3 (calculated value from MSI_CalcXOffset)
@@ -4489,7 +4500,7 @@ PRG011_B970:
     LDA Map_StarsCenterY
     STA Temp_Var8      ; Temp_Var8 = all stars center Y
 
-    JSR PRG011_SUB_B9D4 ; Returns 1 or -1 in Temp_Var6
+    JSR PRG011_SUB_B9D4 ; Returns 1 or <-1 in Temp_Var6
 
     LDA Temp_Var6
     BMI PRG011_B980     ; If Temp_Var6 < 0, jump to PRG011_B980
@@ -4577,7 +4588,7 @@ MSI_DrawStar:
     RTS      ; Return
 
 PRG011_SUB_B9D4:
-    ; Temp_Var1 = 1 or -1
+    ; Temp_Var1 = 1 or <-1
     ; Temp_Var7 = star's X position
     ; Temp_Var8 = all stars center X
 
@@ -4603,8 +4614,8 @@ PRG011_B9EA:
     RTS         ; Return...
 
 PRG011_B9EF:
-    LDA #-1
-    STA Temp_Var6      ; Temp_Var6 = -1
+    LDA #<-1
+    STA Temp_Var6      ; Temp_Var6 = <-1
     RTS         ; Return...
 
 MSI_CalcDeltaAndSteps:
@@ -4659,7 +4670,7 @@ PRG011_BA20:
 
 Map_CompleteY:
     .byte $20, $30, $40, $50, $60, $70, $80
-Map_CompleteY_End
+Map_CompleteY_End:
 
 Map_CompleteBit:
     .byte $80, $40, $20, $10, $08, $04, $02, $01
@@ -4843,13 +4854,13 @@ W8D_CircSprs:
     .byte $10, $0B, $01, $E8
     .byte $F0, $0B, $01, $20
     .byte $00, $0B, $01, $20
-W8D_CircSprs_Unaligned
+W8D_CircSprs_Unaligned:
 
     .byte $10, $0B, $01, $20
     .byte $E0, $87, $01, $F8
     .byte $E0, $87, $01, $10
     .byte $20, $87, $81, $F8
-W8D_CircSprs_Aligned
+W8D_CircSprs_Aligned:
 
 PRG011_BB63:
     .byte $20, $87, $81
