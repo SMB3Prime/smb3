@@ -17,7 +17,7 @@
 
 .include "smb3.inc"
 
-.segment "PRG_31"
+.segment "PRGFIXED_E000"
 
 .export Clear_Nametable_Short, DynJump, IntIRQ, IntIRQ_32PixPart_HideSprites, IntIRQ_32PixelPartition_Part3
 .export IntIRQ_Finish_NoDis, IntNMI, IntReset, PRG031_F499, PRG031_FA3C, PRGROM_Change_A000, PRGROM_Change_Both2

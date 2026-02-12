@@ -15,7 +15,7 @@
 
 .include "smb3.inc"
 
-.segment "PRG_30"
+.segment "PRGFIXED_8000"
 
 .export Bonus_Prize1, Clear_RAM_thru_ZeroPage, EndLevelCard_PalData, GraphicsBuf_Prep_And_WaitVSync, IntReset_Part2
 .export LevelLoad, Level_RecordBlockHit, LoadLevel_Set_TileMemAddr, Map_Calc_NT2Addr_By_XY, Map_Y_Starts, PRG030_845A
