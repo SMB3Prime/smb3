@@ -1,0 +1,7 @@
+image: fortenbt/smb3-build:1
+
+aliases:
+  build:
+    script: make
+  clean:
+    script: make clean
