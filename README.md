@@ -6,7 +6,9 @@ Fork of DevRubicate's fork (https://github.com/devrubicate/smb3) of Captain Sout
 
 # Output
 
-This project builds a stock (U) (PRG1) version of Super Mario Bros. 3 as well as an expanded ROM version.
+This project builds:
+- `smb3.nes` - Stock (U) (PRG1) version of Super Mario Bros. 3
+- `smb3-expanded.nes` - Expanded ROM version
 
 
 -------------
